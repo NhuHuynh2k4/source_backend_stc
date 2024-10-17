@@ -3441,19 +3441,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\ADMIN\\.nuget\\packages\\": {}
+    "C:\\Users\\ACER\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+      "projectUniqueName": "D:\\source_backend_stc\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
       "projectName": "sourc_backend_stc",
-      "projectPath": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
-      "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-      "outputPath": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\obj\\",
+      "projectPath": "D:\\source_backend_stc\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+      "packagesPath": "C:\\Users\\ACER\\.nuget\\packages\\",
+      "outputPath": "D:\\source_backend_stc\\source_backend\\sourc_backend_stc\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ACER\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
