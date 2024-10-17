@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\sourc_backend_stc.props" />
+</Project>
