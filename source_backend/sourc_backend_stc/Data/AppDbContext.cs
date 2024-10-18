@@ -9,5 +9,8 @@ namespace sourc_backend_stc.Data
 
         public DbSet<Student> Students { get; set; }
         public DbSet<Class> Classes { get; set; }
+        public DbSet<Test> Tests { get; set; }
+        public DbSet<Mark> Marks { get; set; }
+        public DbSet<Exam> Exams { get; set; }
     }
 }
