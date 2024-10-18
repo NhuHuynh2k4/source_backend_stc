@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
+    "C:\\Users\\Admin\\Downloads\\source_backend_stc\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
   },
   "projects": {
-    "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {
+    "C:\\Users\\Admin\\Downloads\\source_backend_stc\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "projectUniqueName": "C:\\Users\\Admin\\Downloads\\source_backend_stc\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
         "projectName": "sourc_backend_stc",
-        "projectPath": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
-        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\obj\\",
+        "projectPath": "C:\\Users\\Admin\\Downloads\\source_backend_stc\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Admin\\Downloads\\source_backend_stc\\source_backend\\sourc_backend_stc\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
@@ -32,6 +32,11 @@
           "warnAsError": [
             "NU1605"
           ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -84,7 +89,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403\\RuntimeIdentifierGraph.json"
         }
       }
     }

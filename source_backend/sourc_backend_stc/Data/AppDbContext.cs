@@ -8,5 +8,7 @@ namespace sourc_backend_stc.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Student> Students { get; set; }
+         public DbSet<QuestionType> QuestionTypes { get; set; }
+        public DbSet<ClassStudent> ClassStudents { get; set; }
     }
 }
