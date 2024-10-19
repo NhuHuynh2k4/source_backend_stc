@@ -1,68 +1,70 @@
 using Microsoft.AspNetCore.Mvc;
 using sourc_backend_stc.Data;
+using sourc_backend_stc.Models;
 using System.Linq;
-using System.Threading.Tasks;
 
-[Route("api/[controller]")]
-[ApiController]
-public class ClassStudentController : ControllerBase
+namespace sourc_backend_stc.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public ClassStudentController(AppDbContext context)
+    [Route("api/[controller]")]
+    [ApiController]
+    public class Class_StudentController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
 
-    [HttpGet]
-    public IActionResult GetAll()
-    {
-        var classStudents = _context.ClassStudents.Where(cs => !cs.IsDelete).ToList();
-        return Ok(classStudents);
-    }
+        public Class_StudentController(AppDbContext context)
+        {
+            _context = context;
+        }
 
-    [HttpGet("{id}")]
-    public IActionResult GetById(int id)
-    {
-        var classStudent = _context.ClassStudents.FirstOrDefault(cs => cs.ClassStudentID == id && !cs.IsDelete);
-        if (classStudent == null) return NotFound();
-        return Ok(classStudent);
-    }
+        // GET: api/Class_Student
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var classStudents = _context.Class_Students.Where(cs => !cs.IsDelete).ToList();
+            return Ok(classStudents);
+        }
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ClassStudent classStudent)
-    {
-        _context.ClassStudents.Add(classStudent);
-        await _context.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = classStudent.ClassStudentID }, classStudent);
-    }
+        // POST: api/Class_Student
+        [HttpPost]
+        public IActionResult Create(Class_Student classStudent)
+        {
+            _context.Class_Students.Add(classStudent);
+            _context.SaveChanges();
+            return CreatedAtAction(nameof(GetAll), new { id = classStudent.Class_StudentID }, classStudent);
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] ClassStudent updatedClassStudent)
-    {
-        var existingClassStudent = _context.ClassStudents.FirstOrDefault(cs => cs.ClassStudentID == id && !cs.IsDelete);
-        if (existingClassStudent == null) return NotFound();
+        // PUT: api/Class_Student/5
+        [HttpPut("{id}")]
+        public IActionResult UpdateClassStudent(int id, [FromBody] Class_Student classStudent)
+        {
+            var existingClassStudent = _context.Class_Students.Find(id);
+            if (existingClassStudent == null || existingClassStudent.IsDelete)
+            {
+                return NotFound();
+            }
 
-        existingClassStudent.ClassID = updatedClassStudent.ClassID;
-        existingClassStudent.StudentID = updatedClassStudent.StudentID;
-        existingClassStudent.UpdateDate = DateTime.Now;
+            existingClassStudent.ClassID = classStudent.ClassID;
+            existingClassStudent.StudentID = classStudent.StudentID;
+            existingClassStudent.UpdateDate = DateTime.Now;
 
-        _context.ClassStudents.Update(existingClassStudent);
-        await _context.SaveChangesAsync();
+            _context.SaveChanges();
+            return NoContent();
+        }
 
-        return NoContent();
-    }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var classStudent = _context.ClassStudents.FirstOrDefault(cs => cs.ClassStudentID == id && !cs.IsDelete);
-        if (classStudent == null) return NotFound();
+        // DELETE: api/Class_Student/5
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var classStudent = _context.Class_Students.Find(id);
+            if (classStudent == null || classStudent.IsDelete)
+            {
+                return NotFound();
+            }
 
-        classStudent.IsDelete = true;
-        _context.ClassStudents.Update(classStudent);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+            classStudent.IsDelete = true;
+            _context.SaveChanges();
+            return NoContent();
+        }
     }
 }
