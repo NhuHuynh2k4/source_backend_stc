@@ -1,28 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\FPOLY\\THUCTAP\\da\\source_be_stc_1\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
+    "D:\\thuctap\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
   },
   "projects": {
-    "D:\\FPOLY\\THUCTAP\\da\\source_be_stc_1\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {
+    "D:\\thuctap\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPOLY\\THUCTAP\\da\\source_be_stc_1\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "projectUniqueName": "D:\\thuctap\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
         "projectName": "sourc_backend_stc",
-        "projectPath": "D:\\FPOLY\\THUCTAP\\da\\source_be_stc_1\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
-        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "D:\\FPOLY\\THUCTAP\\da\\source_be_stc_1\\source_backend\\sourc_backend_stc\\obj\\",
+        "projectPath": "D:\\thuctap\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "packagesPath": "C:\\Users\\biika\\.nuget\\packages\\",
+        "outputPath": "D:\\thuctap\\source_backend\\sourc_backend_stc\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\biika\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -35,11 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -96,7 +88,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
         }
       }
     }
