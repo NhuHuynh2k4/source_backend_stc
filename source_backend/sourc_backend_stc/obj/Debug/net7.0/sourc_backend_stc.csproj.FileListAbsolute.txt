@@ -154,3 +154,4 @@ D:\FPOLY\THUCTAP\da\source_be_stc_1\source_backend\sourc_backend_stc\obj\Debug\n
 D:\FPOLY\THUCTAP\da\source_be_stc_1\source_backend\sourc_backend_stc\obj\Debug\net7.0\sourc_backend_stc.pdb
 D:\FPOLY\THUCTAP\da\source_be_stc_1\source_backend\sourc_backend_stc\obj\Debug\net7.0\sourc_backend_stc.genruntimeconfig.cache
 D:\FPOLY\THUCTAP\da\source_be_stc_1\source_backend\sourc_backend_stc\obj\Debug\net7.0\ref\sourc_backend_stc.dll
+F:\DuAnSTC\source_backend\sourc_backend_stc\bin\Debug\net7.0\Dapper.dll
