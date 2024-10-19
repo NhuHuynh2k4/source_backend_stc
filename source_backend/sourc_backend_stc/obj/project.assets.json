@@ -3476,19 +3476,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\biika\\.nuget\\packages\\": {}
+    "C:\\Users\\ADMIN\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\thuctap\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+      "projectUniqueName": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
       "projectName": "sourc_backend_stc",
-      "projectPath": "D:\\thuctap\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
-      "packagesPath": "C:\\Users\\biika\\.nuget\\packages\\",
-      "outputPath": "D:\\thuctap\\source_backend\\sourc_backend_stc\\obj\\",
+      "projectPath": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+      "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+      "outputPath": "F:\\DuAnSTC\\source_backend\\sourc_backend_stc\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\biika\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net7.0"
