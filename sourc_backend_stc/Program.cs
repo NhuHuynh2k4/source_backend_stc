@@ -14,6 +14,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IClassService, ClassService>();
 builder.Services.AddScoped<ITestService, TestService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+builder.Services.AddScoped<IExam_StudentService, Exam_StudentService>();
 // builder.Services.AddDbContext<AppDbContext>(options =>
 //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
