@@ -15,7 +15,7 @@ namespace sourc_backend_stc.Controllers
             _classStudentService = classStudentService;
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("get-by-id/{id}")]
         public IActionResult GetById(int id)
         {
             try
@@ -29,7 +29,22 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPost]
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            try
+            {
+                var result = _classStudentService.GetAllClassStudents();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpPost("create")]
         public IActionResult Create([FromBody] ClassStudent_CreateReq request)
         {
             try
@@ -43,7 +58,7 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public IActionResult Update(int id, [FromBody] ClassStudent_CreateReq request)
         {
             try
@@ -57,7 +72,7 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public IActionResult Delete(int id)
         {
             try
