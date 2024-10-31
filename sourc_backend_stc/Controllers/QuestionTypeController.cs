@@ -15,8 +15,22 @@ namespace sourc_backend_stc.Controllers
             _questionTypeService = questionTypeService;
         }
 
+        [HttpGet("get-all")]
+        public IActionResult GetAll()
+        {
+            try
+            {
+                var result = _questionTypeService.GetAllQuestionType();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
         // Lấy QuestionType theo ID
-        [HttpGet("{id}")]
+        [HttpGet("get-by-id/{id}")]
         public IActionResult GetById(int id)
         {
             try
@@ -31,7 +45,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Tạo mới QuestionType
-        [HttpPost]
+        [HttpPost("create")]
         public IActionResult Create([FromBody] QuestionType_CreateReq req)
         {
             try
@@ -46,7 +60,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Cập nhật QuestionType
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public IActionResult Update(int id, [FromBody] QuestionType_CreateReq req)
         {
             try
@@ -61,7 +75,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Xóa QuestionType
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public IActionResult Delete(int id)
         {
             try

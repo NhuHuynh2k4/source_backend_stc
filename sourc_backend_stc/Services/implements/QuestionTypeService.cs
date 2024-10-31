@@ -4,7 +4,7 @@ using sourc_backend_stc.Data;
 
 namespace sourc_backend_stc.Services
 {
-    public class QuestionTypeService : IQuestionTypeService
+    public class QuestionTypeService : IQuestionTypeService 
     {
         private readonly AppDbContext _context;
 
@@ -13,13 +13,28 @@ namespace sourc_backend_stc.Services
             _context = context;
         }
 
+        public IEnumerable<QuestionTypeResponse> GetAllQuestionType()
+        {
+            return _context.QuestionType
+                .Where(qt => !qt.IsDelete) // Lấy các loại câu hỏi chưa bị xóa
+                .Select(qt => new QuestionTypeResponse
+                {
+                    QuestionTypeID = qt.QuestionTypeID,
+                    QuestionTypeCode = qt.QuestionTypeCode,
+                    QuestionTypeName = qt.QuestionTypeName,
+                    CreateDate = qt.CreateDate,
+                    UpdateDate = qt.UpdateDate
+                })
+                .ToList();
+        }
+
         public QuestionTypeResponse GetQuestionTypeById(int id)
         {
             var validationResult = ErrorHandling.ValidateId(id);
             if (!validationResult.IsValid)
                 throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.InvalidId));
 
-            var questionType = _context.QuestionTypes.FirstOrDefault(qt => qt.QuestionTypeID == id);
+            var questionType = _context.QuestionType.FirstOrDefault(qt => qt.QuestionTypeID == id);
             if (questionType == null)
                 throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
 
@@ -41,13 +56,13 @@ namespace sourc_backend_stc.Services
                 QuestionTypeName = request.QuestionTypeName
             };
 
-            _context.QuestionTypes.Add(newQuestionType);
+            _context.QuestionType.Add(newQuestionType);
             _context.SaveChanges();
         }
 
         public void UpdateQuestionType(int id, QuestionType_CreateReq request)
         {
-            var questionType = _context.QuestionTypes.FirstOrDefault(qt => qt.QuestionTypeID == id);
+            var questionType = _context.QuestionType.FirstOrDefault(qt => qt.QuestionTypeID == id);
             if (questionType == null)
                 throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
 
@@ -60,7 +75,7 @@ namespace sourc_backend_stc.Services
 
         public void DeleteQuestionType(int id)
         {
-            var questionType = _context.QuestionTypes.FirstOrDefault(qt => qt.QuestionTypeID == id);
+            var questionType = _context.QuestionType.FirstOrDefault(qt => qt.QuestionTypeID == id);
             if (questionType == null)
                 throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
 

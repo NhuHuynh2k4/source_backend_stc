@@ -1,8 +1,8 @@
 namespace sourc_backend_stc.Models
 {
-    public class ClassStudentResponse
+    public class ClassStudent_ReadAllRes
     {
-        public int ClassStudentID { get; set; }
+        public int Class_StudentID { get; set; }
         public DateTime CreateDate { get; set; }
         public DateTime UpdateDate { get; set; }
         public int ClassID { get; set; }
