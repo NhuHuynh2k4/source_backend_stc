@@ -16,6 +16,8 @@ builder.Services.AddScoped<IClassService, ClassService>();
 builder.Services.AddScoped<ITestService, TestService>();
 builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IExam_StudentService, Exam_StudentService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
 // builder.Services.AddDbContext<AppDbContext>(options =>
 //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
