@@ -4,6 +4,7 @@ namespace sourc_backend_stc.Models
     {
         public string StudentCode { get; set; }
         public string StudentName { get; set; }
+        public string Password { get; set; }
         public bool Gender{ get; set;}
         public string NumberPhone { get; set; }
         public string Address { get; set; }

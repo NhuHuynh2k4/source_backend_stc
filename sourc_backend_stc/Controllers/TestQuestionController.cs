@@ -5,11 +5,13 @@ using sourc_backend_stc.Models;
 using Dapper;
 using sourc_backend_stc.Services;
 using sourc_backend_stc.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TestQuestionController : ControllerBase
     {
         private readonly ITestQuestionService _testQuestionService;

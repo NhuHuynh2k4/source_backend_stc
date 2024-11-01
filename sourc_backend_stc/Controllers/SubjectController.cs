@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sourc_backend_stc.Models;
 using sourc_backend_stc.Services;
@@ -8,6 +9,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class SubjectController : ControllerBase
     {
         private readonly ISubjectService _subjectService;
@@ -32,17 +34,19 @@ namespace sourc_backend_stc.Controllers
             if (request == null)
                 return BadRequest("Yêu cầu không hợp lệ.");
 
-            var subjectId = await _subjectService.CreateSubjectAsync(request);
-
-            if (subjectId > 0)
+            try
             {
-                return CreatedAtAction(nameof(GetSubjectById), new { subjectId }, "Môn học đã được tạo thành công.");
+                // Gọi phương thức tạo môn học
+                await _subjectService.CreateSubjectAsync(request);
+                return Ok(new { message = "Môn học đã tạo thành công." });
             }
-            else
+            catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo môn học.");
+                // Trả về thông báo lỗi nếu có ngoại lệ xảy ra
+                return BadRequest(new { message = ex.Message });
             }
         }
+
 
         // Lấy môn học theo ID
         [HttpGet("get-by-id/{subjectId}")]

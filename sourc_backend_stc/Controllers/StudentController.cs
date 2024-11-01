@@ -5,11 +5,13 @@ using sourc_backend_stc.Models;
 using Dapper;
 using sourc_backend_stc.Services;
 using sourc_backend_stc.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+
     public class StudentController : ControllerBase
     {
         private readonly IStudentService _studentService;
@@ -21,7 +23,8 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy tất cả các sinh viên
         [HttpGet("get-all")]
-        public async Task<ActionResult<IEnumerable<Student>>> GetAllStudent()
+        [Authorize]
+        public async Task<ActionResult<IEnumerable<Student_ReadAllRes>>> GetAllStudent()
         {
             var classes = await _studentService.GetAllStudent();
             return Ok(classes); // Trả về danh sách sinh viên với mã 200 OK
@@ -52,74 +55,76 @@ namespace sourc_backend_stc.Controllers
         }
 
 
-            // // Lấy Student theo ID
-            [HttpGet("get-by-id/{studentId}")]
-            public async Task<IActionResult> GetStudentById(int studentId)
+        // // Lấy Student theo ID
+        [HttpGet("get-by-id/{studentId}")]
+        [Authorize]
+        public async Task<IActionResult> GetStudentById(int studentId)
+        {
+            if (studentId <= 0)
             {
-                if (studentId <= 0)
-                {
-                    // Trả về mã lỗi 400 nếu studentId không hợp lệ
-                    return BadRequest("ID sinh viên không hợp lệ.");
-                }
-
-                var studentInfo = await _studentService.GetStudentById(studentId);
-
-                if (studentInfo != null)
-                {
-                    // Trả về mã 200 OK và thông tin lớp học nếu tìm thấy
-                    return Ok(studentInfo);
-                }
-                else
-                {
-                    // Trả về mã lỗi 404 nếu không tìm thấy lớp học
-                    return NotFound("Không tìm thấy sinh viên với ID đã cho.");
-                }
+                // Trả về mã lỗi 400 nếu studentId không hợp lệ
+                return BadRequest("ID sinh viên không hợp lệ.");
             }
 
-            [HttpPut("update/{studentId}")]
-            public async Task<IActionResult> UpdateClassUpdateStudent(int studentId, [FromBody] Student_UpdateReq updateReq)
+            var studentInfo = await _studentService.GetStudentById(studentId);
+
+            if (studentInfo != null)
             {
-                if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.StudentCode) 
-                || string.IsNullOrWhiteSpace(updateReq.StudentName) 
-                || string.IsNullOrWhiteSpace(updateReq.NumberPhone) 
-                || string.IsNullOrWhiteSpace(updateReq.Email))
-                {
-                    return BadRequest("Dữ liệu cập nhật không hợp lệ.");
-                }
+                // Trả về mã 200 OK và thông tin lớp học nếu tìm thấy
+                return Ok(studentInfo);
+            }
+            else
+            {
+                // Trả về mã lỗi 404 nếu không tìm thấy lớp học
+                return NotFound("Không tìm thấy sinh viên với ID đã cho.");
+            }
+        }
 
-                var isUpdated = await _studentService.UpdateStudent(studentId, updateReq);
-
-                if (isUpdated)
-                {
-                    return Ok("Cập nhật sinh viên thành công.");
-                }
-                else
-                {
-                    return NotFound("Không tìm thấy sinh viên hoặc cập nhật thất bại.");
-                }
+        [HttpPut("update/{studentId}")]
+        [Authorize]
+        public async Task<IActionResult> UpdateClassUpdateStudent(int studentId, [FromBody] Student_UpdateReq updateReq)
+        {
+            if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.StudentCode)
+            || string.IsNullOrWhiteSpace(updateReq.StudentName)
+            || string.IsNullOrWhiteSpace(updateReq.NumberPhone)
+            || string.IsNullOrWhiteSpace(updateReq.Email))
+            {
+                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
+            var isUpdated = await _studentService.UpdateStudent(studentId, updateReq);
 
-            [HttpDelete("delete/{studentId}")]
-            public async Task<IActionResult> DeleteStudent(int studentId)
+            if (isUpdated)
             {
-                if (studentId <= 0)
-                {
-                    return BadRequest("ID sinh viên không hợp lệ.");
-                }
+                return Ok("Cập nhật sinh viên thành công.");
+            }
+            else
+            {
+                return NotFound("Không tìm thấy sinh viên hoặc cập nhật thất bại.");
+            }
+        }
 
-                var isDeleted = await _studentService.DeleteStudent(studentId);
 
-                if (isDeleted)
-                {
-                    return Ok("Đã xóa mềm sinh viên thành công.");
-                }
-                else
-                {
-                    return NotFound("Không tìm thấy sinh viên với ID đã cho.");
-                }
+        [HttpDelete("delete/{studentId}")]
+        [Authorize]
+        public async Task<IActionResult> DeleteStudent(int studentId)
+        {
+            if (studentId <= 0)
+            {
+                return BadRequest("ID sinh viên không hợp lệ.");
             }
 
+            var isDeleted = await _studentService.DeleteStudent(studentId);
+
+            if (isDeleted)
+            {
+                return Ok("Đã xóa mềm sinh viên thành công.");
+            }
+            else
+            {
+                return NotFound("Không tìm thấy sinh viên với ID đã cho.");
+            }
+        }
     }
 
 }

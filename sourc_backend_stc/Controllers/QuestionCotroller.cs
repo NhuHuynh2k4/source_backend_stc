@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sourc_backend_stc.Models;
 using sourc_backend_stc.Services;
@@ -6,6 +7,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class QuestionController : ControllerBase
     {
         private readonly IQuestionService _questionService;
@@ -44,12 +46,18 @@ namespace sourc_backend_stc.Controllers
             if (request == null || string.IsNullOrWhiteSpace(request.QuestionCode) || string.IsNullOrWhiteSpace(request.QuestionName))
                 return BadRequest("Dữ liệu câu hỏi không hợp lệ.");
 
-            var newQuestionId = await _questionService.CreateQuestion(request);
-            if (newQuestionId > 0)
-                return CreatedAtAction(nameof(GetQuestionById), new { questionId = newQuestionId }, "Câu hỏi đã được tạo thành công.");
-
-            return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo câu hỏi.");
+            try
+            {
+                await _questionService.CreateQuestion(request); // Đảm bảo gọi hàm này là async
+                return Ok(new { message = "Câu hỏi đã tạo thành công." });
+            }
+            catch (Exception ex)
+            {
+                // Trả về thông báo lỗi nếu có ngoại lệ xảy ra
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
 
         // Cập nhật câu hỏi
         [HttpPut("update/{questionId}")]

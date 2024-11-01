@@ -5,11 +5,13 @@ using sourc_backend_stc.Models;
 using Dapper;
 using sourc_backend_stc.Services;
 using sourc_backend_stc.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class AnswerController : ControllerBase
     {
         private readonly IAnswerService _answerService;
@@ -38,7 +40,7 @@ namespace sourc_backend_stc.Controllers
             }
 
             var isCreated = await _answerService.CreateAnswer(answerDto);
-
+            Console.WriteLine(isCreated);
             if (isCreated)
             {
                 // Trả về mã 201 Created nếu thành công
