@@ -23,5 +23,7 @@ namespace sourc_backend_stc.Data
                 .ToTable("QuestionType"); // Cấu hình tên bảng tại đây
         }
         public DbSet<QuestionType> QuestionType { get; set; }
+
+        public DbSet<Student> Student{ get; set; }
     }
 }

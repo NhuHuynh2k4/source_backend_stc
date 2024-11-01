@@ -20,7 +20,7 @@ namespace sourc_backend_stc.Services
 
         // Các phương thức khác...
 
-        public async Task<IEnumerable<Student>> GetAllStudent()
+        public async Task<IEnumerable<Student_ReadAllRes>> GetAllStudent()
         {
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
@@ -35,7 +35,7 @@ namespace sourc_backend_stc.Services
                     );
 
 
-                    return result.Select(StudentInfo => new Student
+                    return result.Select(StudentInfo => new Student_ReadAllRes
                     {
                         StudentID = StudentInfo.StudentID,
                         StudentCode = StudentInfo.StudentCode,
@@ -53,13 +53,13 @@ namespace sourc_backend_stc.Services
                 catch (Exception ex)
                 {
                     // Log lỗi nếu cần
-                    return Enumerable.Empty<Student>(); // Trả về danh sách trống nếu có lỗi
+                    return Enumerable.Empty<Student_ReadAllRes>(); // Trả về danh sách trống nếu có lỗi
                 }
             }
         }
 
 
-        public async Task<Student> GetStudentById(int studentId)
+        public async Task<Student_ReadAllRes> GetStudentById(int studentId)
         {
 
             var (isValid, errorMessage) = ErrorHandling.ValidateId(studentId);
@@ -75,7 +75,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Sử dụng Dapper để gọi stored procedure
-                    var result = await connection.QueryFirstOrDefaultAsync<Student>(
+                    var result = await connection.QueryFirstOrDefaultAsync<Student_ReadAllRes>(
                         "GetStudentByID",  // Tên stored procedure
                         new {StudentID = studentId },  // Tham số đầu vào
                         commandType: CommandType.StoredProcedure  // Xác định là stored procedure
@@ -95,20 +95,23 @@ namespace sourc_backend_stc.Services
             // Kiểm tra đầu vào
             var (isValidCode, messageCode) = ErrorHandling.HandleIfEmpty(createReq.StudentCode);
             var (isValidName, messageName) = ErrorHandling.HandleIfEmpty(createReq.StudentName);
+            var (isValidPass, messagePass) = ErrorHandling.HandleIfEmpty(createReq.Email);
             var (isValidNumberphone, messageNumberphone) = ErrorHandling.HandleIfEmpty(createReq.NumberPhone);
             var (isValidAddress, messageAddress) = ErrorHandling.HandleIfEmpty(createReq.Address);
             var (isValidEmail, messageEmail) = ErrorHandling.HandleIfEmpty(createReq.Email);
 
             // Kiểm tra tất cả các trường đầu vào
-            if (!isValidCode || !isValidName || !isValidNumberphone || !isValidAddress || !isValidEmail)
+            if (!isValidCode || !isValidName || !isValidPass || !isValidNumberphone || !isValidAddress || !isValidEmail)
             {
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
+            var hashedPassword = PasswordHasher.HashPassword(createReq.Password);
             var newStudent = new Student_CreateReq
             {
                 StudentCode = createReq.StudentCode,
                 StudentName = createReq.StudentName,
+                Password = hashedPassword,
                 Gender = createReq.Gender,
                 NumberPhone = createReq.NumberPhone,
                 Address = createReq.Address,

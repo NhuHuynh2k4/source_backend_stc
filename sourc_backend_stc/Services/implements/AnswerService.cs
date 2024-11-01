@@ -34,7 +34,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure // Xác định là stored procedure
                     );
 
-                    // Chỉ chọn các cột cần thiết mà không bao gồm IsDelete
+                    // Chỉ chọn các cột cần thiết
                     return result.Select(answerInfo => new Answer_ReadAllRes
                     {
                         AnswerID = answerInfo.AnswerID,
@@ -93,8 +93,9 @@ namespace sourc_backend_stc.Services
             // Kiểm tra đầu vào
             var (isValidAnswerTextContent, messageAnswerTextContent) = ErrorHandling.HandleIfEmpty(answerDto.AnswerTextContent);
             var (isValidAnswerName, messageAnswerName) = ErrorHandling.HandleIfEmpty(answerDto.AnswerName);
+            var (isValidQuestionID, messageQuestionID) = ErrorHandling.ValidateId(answerDto.QuestionID);
 
-            if (!isValidAnswerName || !isValidAnswerTextContent)
+            if (!isValidAnswerName || !isValidAnswerTextContent || answerDto.IsTrue!=true || answerDto.IsTrue!=false )
             {
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }

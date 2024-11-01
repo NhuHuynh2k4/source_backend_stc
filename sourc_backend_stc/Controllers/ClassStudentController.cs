@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sourc_backend_stc.Models;
 using sourc_backend_stc.Services;
@@ -6,6 +7,7 @@ namespace sourc_backend_stc.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ClassStudentController : ControllerBase
     {
         private readonly IClassStudentService _classStudentService;

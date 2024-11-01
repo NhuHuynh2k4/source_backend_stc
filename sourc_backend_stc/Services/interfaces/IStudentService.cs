@@ -8,8 +8,8 @@ namespace sourc_backend_stc.Services
         Task<bool> CreateStudent(Student_CreateReq createReq);
         Task<bool> UpdateStudent(int StudentID, Student_UpdateReq updateReq);
         Task<bool> DeleteStudent(int StudentID);
-        Task<Student> GetStudentById(int StudentID);
-        Task<IEnumerable<Student>> GetAllStudent();
+        Task<Student_ReadAllRes> GetStudentById(int StudentID);
+        Task<IEnumerable<Student_ReadAllRes>> GetAllStudent();
     }
 
 }

@@ -5,11 +5,13 @@ using sourc_backend_stc.Models;
 using Dapper;
 using sourc_backend_stc.Services;
 using sourc_backend_stc.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class Exam_StudentController : ControllerBase
     {
         private readonly IExam_StudentService _exam_studentService;
@@ -52,7 +54,7 @@ namespace sourc_backend_stc.Controllers
 
 
         // // Lấy Student theo ID
-        [HttpGet("get-by-id/{exam_studentID}")]
+        [HttpGet("get-by-id/{Exam_StudentId}")]
         public async Task<IActionResult> GetStudentById(int Exam_StudentId)
         {
             if (Exam_StudentId <= 0)
@@ -75,7 +77,7 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPut("update/{exam_studentId}")]
+        [HttpPut("update/{Exam_StudentId}")]
         public async Task<IActionResult> UpdateExam_Student(int Exam_StudentId, [FromBody] Exam_Student_UpdateReq updateReq)
         {
             if (updateReq == null || updateReq.ExamID <= 0 || updateReq.StudentID <= 0)
@@ -98,7 +100,7 @@ namespace sourc_backend_stc.Controllers
 
 
 
-        [HttpDelete("delete/{exam_studentId}")]
+        [HttpDelete("delete/{Exam_StudentId}")]
         public async Task<IActionResult> DeleteStudent(int Exam_StudentId)
         {
             if (Exam_StudentId <= 0)

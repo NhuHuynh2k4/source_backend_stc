@@ -103,7 +103,8 @@ namespace sourc_backend_stc.Services
             {
                 TestCode = testDto.TestCode,
                 TestName = testDto.TestName,
-                NumberOfQuestions = testDto.NumberOfQuestions
+                NumberOfQuestions = testDto.NumberOfQuestions,
+                SubjectsID = testDto.SubjectsID
             };
 
             using (var connection = DatabaseConnection.GetConnection(_configuration))

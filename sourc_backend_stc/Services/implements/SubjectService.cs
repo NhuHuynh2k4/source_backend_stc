@@ -32,13 +32,13 @@ namespace sourc_backend_stc.Services
                 commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<int> CreateSubjectAsync(Subject_CreateReq request)
+        public async Task<bool> CreateSubjectAsync(Subject_CreateReq request)
         {
             using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             var parameters = new DynamicParameters();
             parameters.Add("@SubjectsCode", request.SubjectsCode);
             parameters.Add("@SubjectsName", request.SubjectsName);
-            return await connection.ExecuteScalarAsync<int>("CreateSubject", parameters, commandType: CommandType.StoredProcedure);
+            return await connection.ExecuteScalarAsync<bool>("CreateSubject", parameters, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<bool> UpdateSubjectAsync(int subjectId, Subject_UpdateReq request)
