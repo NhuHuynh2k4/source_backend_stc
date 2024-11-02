@@ -29,18 +29,24 @@ namespace sourc_backend_stc.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateSubject([FromBody] Subject_CreateReq request)
         {
-            if (request == null)
-                return BadRequest("Yêu cầu không hợp lệ.");
-
-            var subjectId = await _subjectService.CreateSubjectAsync(request);
-
-            if (subjectId > 0)
+            // Validate request
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.SubjectsCode) || request.SubjectsCode == "string" ||
+                string.IsNullOrWhiteSpace(request.SubjectsName) || request.SubjectsName == "string")
             {
-                return CreatedAtAction(nameof(GetSubjectById), new { subjectId }, "Môn học đã được tạo thành công.");
+                return BadRequest("Yêu cầu không hợp lệ");
             }
-            else
+
+            try
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo môn học.");
+                // Gọi phương thức tạo môn học
+                await _subjectService.CreateSubjectAsync(request);
+                return Ok(new { message = "Môn học đã tạo thành công." });
+            }
+            catch (Exception ex)
+            {
+                // Trả về thông báo lỗi nếu có ngoại lệ xảy ra
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -59,11 +65,15 @@ namespace sourc_backend_stc.Controllers
         [HttpPut("update/{subjectId}")]
         public async Task<IActionResult> UpdateSubject(int subjectId, [FromBody] Subject_UpdateReq request)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.SubjectsCode) || string.IsNullOrWhiteSpace(request.SubjectsName))
+            // Validate request
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.SubjectsCode) || request.SubjectsCode == "string" ||
+                string.IsNullOrWhiteSpace(request.SubjectsName) || request.SubjectsName == "string")
+            {
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
+            }
 
             var isUpdated = await _subjectService.UpdateSubjectAsync(subjectId, request);
-
             return isUpdated ? Ok("Cập nhật môn học thành công.") : NotFound("Không tìm thấy môn học hoặc cập nhật thất bại.");
         }
 
