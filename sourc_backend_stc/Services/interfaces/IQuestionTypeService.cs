@@ -4,10 +4,10 @@ namespace sourc_backend_stc.Services
 {
     public interface IQuestionTypeService
     {
-        IEnumerable<QuestionTypeResponse> GetAllQuestionType();
-        QuestionTypeResponse GetQuestionTypeById(int id);
-        void CreateQuestionType(QuestionType_CreateReq request);
-        void UpdateQuestionType(int id, QuestionType_CreateReq request);
-        void DeleteQuestionType(int id);
+        Task<IEnumerable<QuestionTypeResponse>> GetAllQuestionType();
+        Task<QuestionTypeResponse> GetQuestionTypeById(int id);
+        Task<bool> CreateQuestionType(QuestionType_CreateReq request);
+        Task<bool> UpdateQuestionType(int id, QuestionType_UpdateReq request);
+        Task<bool> DeleteQuestionType(int id);
     }
 }

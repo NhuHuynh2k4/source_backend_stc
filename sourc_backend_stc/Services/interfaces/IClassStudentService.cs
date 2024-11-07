@@ -4,10 +4,10 @@ namespace sourc_backend_stc.Services
 {
     public interface IClassStudentService
     {
-        ClassStudent_ReadAllRes GetClassStudentById(int id);
-        IEnumerable<ClassStudent_ReadAllRes> GetAllClassStudents(); // Thay đổi kiểu trả về
-        void CreateClassStudent(ClassStudent_CreateReq request);
-        void UpdateClassStudent(int id, ClassStudent_CreateReq request);
-        void DeleteClassStudent(int id);
+        Task<ClassStudent_ReadAllRes> GetClassStudentById(int id); // Change return type to Task<ClassStudent_ReadAllRes>
+        Task<IEnumerable<ClassStudent_ReadAllRes>> GetAllClassStudent(); // Change return type to Task<IEnumerable<ClassStudent_ReadAllRes>>
+        Task<bool> CreateClassStudent(ClassStudent_CreateReq request); // Change return type to Task<bool>
+        Task<bool> UpdateClassStudent(int id, ClassStudent_UpdateReq updateReq); // Change return type to Task<bool>
+        Task<bool> DeleteClassStudent(int id); // Change return type to Task<bool>
     }
 }

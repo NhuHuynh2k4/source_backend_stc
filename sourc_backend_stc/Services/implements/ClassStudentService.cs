@@ -1,102 +1,169 @@
+using Microsoft.Data.SqlClient;
 using sourc_backend_stc.Models;
-using sourc_backend_stc.Data;
-using sourc_backend_stc.Utils;
+using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Dapper;
+using System.Data;
 
 namespace sourc_backend_stc.Services
 {
     public class ClassStudentService : IClassStudentService
     {
-        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
 
-        public ClassStudentService(AppDbContext context)
+        public ClassStudentService(IConfiguration configuration)
         {
-            _context = context;
+            _configuration = configuration;
         }
 
-        public ClassStudent_ReadAllRes GetClassStudentById(int id)
+        // Lấy tất cả ClassStudents
+        public async Task<IEnumerable<ClassStudent_ReadAllRes>> GetAllClassStudent()
         {
-            var validationResult = ErrorHandling.ValidateId(id);
-            if (!validationResult.IsValid)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.InvalidId));
-
-            // Truy vấn dữ liệu từ cơ sở dữ liệu
-            var classStudent = _context.ClassStudents.FirstOrDefault(cs => cs.Class_StudentID == id);
-
-            if (classStudent == null)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
-
-            // Chuyển đổi dữ liệu từ ClassStudent sang ClassStudentResponse
-            return new ClassStudent_ReadAllRes
+            using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
-                Class_StudentID = classStudent.Class_StudentID,
-                ClassID = classStudent.ClassID,
-                StudentID = classStudent.StudentID,
-                CreateDate = classStudent.CreateDate,
-                UpdateDate = classStudent.UpdateDate
-            };
-        }
-        public IEnumerable<ClassStudent_ReadAllRes> GetAllClassStudents()
-        {
-            // Truy vấn tất cả dữ liệu từ cơ sở dữ liệu
-            var classStudents = _context.ClassStudents
-                .Where(cs => !cs.IsDelete) // Lọc bỏ những bản ghi đã bị xóa
-                .ToList();
+                await connection.OpenAsync();
 
-            // Chuyển đổi dữ liệu sang ClassStudent_ReadAllRes
-            return classStudents.Select(cs => new ClassStudent_ReadAllRes
+                try
+                {
+                    var result = await connection.QueryAsync<ClassStudent_ReadAllRes>(
+                        "GetAllClassStudent",
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    // Log lỗi ra console hoặc file log để biết chi tiết lỗi từ database
+                    Console.WriteLine($"Lỗi khi truy vấn database: {ex.Message}");
+                    throw new Exception("Lỗi khi lấy danh sách ClassStudent từ database.");
+                }
+            }
+        }
+
+
+        // Lấy thông tin ClassStudent theo ID
+        public async Task<ClassStudent_ReadAllRes> GetClassStudentById(int classStudentId)
+        {
+            using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
-                Class_StudentID = cs.Class_StudentID, // Đảm bảo sử dụng đúng thuộc tính
-                ClassID = cs.ClassID,
-                StudentID = cs.StudentID,
-                CreateDate = cs.CreateDate,
-                UpdateDate = cs.UpdateDate
-            });
+                await connection.OpenAsync();
+
+                try
+                {
+                    var result = await connection.QueryFirstOrDefaultAsync<ClassStudent_ReadAllRes>(
+                        "GetClassStudentById", // Tên stored procedure
+                        new { Class_StudentID = classStudentId }, // Truyền tham số đúng tên
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    if (result == null)
+                    {
+                        Console.WriteLine($"Không tìm thấy ClassStudent với ID: {classStudentId}");
+                    }
+
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Lỗi khi lấy ClassStudent theo ID: {ex.Message}");
+                    throw new Exception("Lỗi khi lấy ClassStudent theo ID", ex);
+                }
+            }
         }
 
-
-        public void CreateClassStudent(ClassStudent_CreateReq request)
+        // Tạo mới ClassStudent
+        public async Task<bool> CreateClassStudent(ClassStudent_CreateReq classStudentDto)
         {
-            var classStudent = new ClassStudent
+            using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
-                ClassID = request.ClassID,
-                StudentID = request.StudentID
-            };
-            _context.ClassStudents.Add(classStudent);
-            _context.SaveChanges();
+                await connection.OpenAsync();
+
+                try
+                {
+                    var result = await connection.ExecuteAsync(
+                        "CreateClassStudent",
+                        classStudentDto,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    return result > 0;
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Lỗi khi tạo mới ClassStudent", ex);
+                }
+            }
         }
 
-        public void UpdateClassStudent(int id, ClassStudent_CreateReq request)
+        // Cập nhật ClassStudent
+        public async Task<bool> UpdateClassStudent(int classStudentId, ClassStudent_UpdateReq updateReq)
         {
-            var validationResult = ErrorHandling.ValidateId(id);
-            if (!validationResult.IsValid)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.InvalidId));
+            using (var connection = DatabaseConnection.GetConnection(_configuration))
+            {
+                await connection.OpenAsync();
 
-            var classStudent = _context.ClassStudents.FirstOrDefault(cs => cs.Class_StudentID == id);
+                try
+                {
+                    // Truyền tham số đúng vào stored procedure
+                    var result = await connection.ExecuteAsync(
+                        "UpdateClassStudent",  // Tên của stored procedure
+                        new
+                        {
+                            Class_StudentID = classStudentId, // Truyền tham số Class_StudentID
+                            ClassID = updateReq.ClassID, // Truyền tham số ClassID
+                            StudentID = updateReq.StudentID // Truyền tham số StudentID
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
 
-            if (classStudent == null)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
-
-            classStudent.ClassID = request.ClassID;
-            classStudent.StudentID = request.StudentID;
-            classStudent.UpdateDate = DateTime.Now;
-
-            _context.SaveChanges();
+                    return result > 0; // Trả về true nếu có bản ghi được cập nhật
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Lỗi khi cập nhật ClassStudent", ex);
+                }
+            }
         }
 
-        public void DeleteClassStudent(int id)
+        // Xóa ClassStudent
+        public async Task<bool> DeleteClassStudent(int classStudentId)
         {
-            var validationResult = ErrorHandling.ValidateId(id);
-            if (!validationResult.IsValid)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.InvalidId));
+            using (var connection = DatabaseConnection.GetConnection(_configuration))
+            {
+                await connection.OpenAsync();
 
-            var classStudent = _context.ClassStudents.FirstOrDefault(cs => cs.Class_StudentID == id);
+                try
+                {
+                    // Kiểm tra xem ClassStudent có tồn tại hay không
+                    var existingClassStudent = await connection.QueryFirstOrDefaultAsync<ClassStudent>(
+                        "GetClassStudentById", // Giả sử bạn có một stored procedure hoặc query để lấy ClassStudent theo ID
+                        new { Class_StudentID = classStudentId },
+                        commandType: CommandType.StoredProcedure
+                    );
 
-            if (classStudent == null)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
+                    // Nếu không tìm thấy ClassStudent, ném ra ngoại lệ
+                    if (existingClassStudent == null)
+                    {
+                        throw new Exception($"Không tìm thấy ClassStudent với ID {classStudentId}. Không thể xóa.");
+                    }
 
-            classStudent.IsDelete = true; // Đánh dấu đã xóa thay vì xóa vật lý
-            _context.SaveChanges();
+                    // Nếu tồn tại ClassStudent, thực hiện xóa
+                    var result = await connection.ExecuteAsync(
+                        "DeleteClassStudent",  // Tên của stored procedure xóa ClassStudent
+                        new { Class_StudentID = classStudentId },
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    return result > 0; // Trả về true nếu xóa thành công
+                }
+                catch (Exception ex)
+                {
+                    // Lỗi khác trong quá trình xóa
+                    throw new Exception("Lỗi khi xóa ClassStudent", ex);
+                }
+            }
         }
     }
-
 }
