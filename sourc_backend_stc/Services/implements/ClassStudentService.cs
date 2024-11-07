@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Dapper;
 using System.Data;
+using Newtonsoft.Json;
 
 namespace sourc_backend_stc.Services
 {
@@ -98,7 +99,7 @@ namespace sourc_backend_stc.Services
         }
 
         // Cập nhật ClassStudent
-        public async Task<bool> UpdateClassStudent(int classStudentId, ClassStudent_UpdateReq updateReq)
+        public async Task<bool> UpdateClassStudent(int id, ClassStudent_UpdateReq updateReq)
         {
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
@@ -106,19 +107,25 @@ namespace sourc_backend_stc.Services
 
                 try
                 {
-                    // Truyền tham số đúng vào stored procedure
+                    // Kiểm tra nếu dữ liệu yêu cầu cập nhật không hợp lệ
+                    if (updateReq == null)
+                    {
+                        throw new ArgumentException("Dữ liệu yêu cầu không hợp lệ.");
+                    }
+
+                    // Thực hiện cập nhật thông qua stored procedure
                     var result = await connection.ExecuteAsync(
-                        "UpdateClassStudent",  // Tên của stored procedure
+                        "UpdateClassStudent",
                         new
                         {
-                            Class_StudentID = classStudentId, // Truyền tham số Class_StudentID
-                            ClassID = updateReq.ClassID, // Truyền tham số ClassID
-                            StudentID = updateReq.StudentID // Truyền tham số StudentID
+                            Class_StudentID = id, // Truyền ID của ClassStudent từ tham số
+                            ClassID = updateReq.ClassID,
+                            StudentID = updateReq.StudentID
                         },
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu có bản ghi được cập nhật
+                    return result > 0; // Trả về true nếu cập nhật thành công
                 }
                 catch (Exception ex)
                 {
