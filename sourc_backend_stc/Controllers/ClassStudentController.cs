@@ -17,12 +17,14 @@ namespace sourc_backend_stc.Controllers
             _classStudentService = classStudentService;
         }
 
+        // Lấy thông tin ClassStudent theo ID
         [HttpGet("get-by-id/{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetClassStudentByID(int id)
         {
             try
             {
-                var result = _classStudentService.GetClassStudentById(id);
+                var result = await _classStudentService.GetClassStudentById(id);
+                if (result == null) return NotFound(new { message = "ClassStudent không tồn tại." });
                 return Ok(result);
             }
             catch (Exception ex)
@@ -31,27 +33,35 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
+        // Lấy tất cả ClassStudents
         [HttpGet("get-all")]
         public IActionResult GetAll()
         {
             try
             {
-                var result = _classStudentService.GetAllClassStudents();
+                var result = _classStudentService.GetAllClassStudent().Result;
+                if (result == null || !result.Any())
+                {
+                    return NotFound(new { message = "Không có bản ghi nào." });
+                }
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                // Log chi tiết lỗi vào log server (có thể sử dụng logging như NLog, Serilog)
+                return StatusCode(500, new { message = "Lỗi khi lấy danh sách ClassStudent", error = ex.Message });
             }
         }
 
 
+        // Tạo mới ClassStudent
         [HttpPost("create")]
-        public IActionResult Create([FromBody] ClassStudent_CreateReq request)
+        public async Task<IActionResult> Create([FromBody] ClassStudent_CreateReq request)
         {
             try
             {
-                _classStudentService.CreateClassStudent(request);
+                var success = await _classStudentService.CreateClassStudent(request);
+                if (!success) return BadRequest(new { message = "Tạo mới thất bại." });
                 return Ok(new { message = "Tạo mới thành công." });
             }
             catch (Exception ex)
@@ -60,12 +70,14 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
+        // Cập nhật ClassStudent
         [HttpPut("update/{id}")]
-        public IActionResult Update(int id, [FromBody] ClassStudent_CreateReq request)
+        public async Task<IActionResult> Update(int id, [FromBody] ClassStudent_UpdateReq updateReq)
         {
             try
             {
-                _classStudentService.UpdateClassStudent(id, request);
+                var success = await _classStudentService.UpdateClassStudent(id, updateReq);
+                if (!success) return BadRequest(new { message = "Cập nhật thất bại." });
                 return Ok(new { message = "Cập nhật thành công." });
             }
             catch (Exception ex)
@@ -74,12 +86,14 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
+        // Xóa ClassStudent
         [HttpDelete("delete/{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                _classStudentService.DeleteClassStudent(id);
+                var success = await _classStudentService.DeleteClassStudent(id);
+                if (!success) return BadRequest(new { message = "Xóa thất bại." });
                 return Ok(new { message = "Xóa thành công." });
             }
             catch (Exception ex)

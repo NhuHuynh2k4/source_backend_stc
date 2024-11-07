@@ -1,86 +1,164 @@
+using Microsoft.Data.SqlClient;
 using sourc_backend_stc.Models;
-using sourc_backend_stc.Utils;
-using sourc_backend_stc.Data;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Data;
+using System.Threading.Tasks;
+using Dapper;
 
 namespace sourc_backend_stc.Services
 {
-    public class QuestionTypeService : IQuestionTypeService 
+    public class QuestionTypeService : IQuestionTypeService
     {
-        private readonly AppDbContext _context;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<QuestionTypeService> _logger;
 
-        public QuestionTypeService(AppDbContext context)
+        public QuestionTypeService(IConfiguration configuration, ILogger<QuestionTypeService> logger)
         {
-            _context = context;
+            _configuration = configuration;
+            _logger = logger;
         }
 
-        public IEnumerable<QuestionTypeResponse> GetAllQuestionType()
+        // Lấy tất cả QuestionTypes
+        public async Task<IEnumerable<QuestionTypeResponse>> GetAllQuestionType()
         {
-            return _context.QuestionType
-                .Where(qt => !qt.IsDelete) // Lấy các loại câu hỏi chưa bị xóa
-                .Select(qt => new QuestionTypeResponse
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+                try
                 {
-                    QuestionTypeID = qt.QuestionTypeID,
-                    QuestionTypeCode = qt.QuestionTypeCode,
-                    QuestionTypeName = qt.QuestionTypeName,
-                    CreateDate = qt.CreateDate,
-                    UpdateDate = qt.UpdateDate
-                })
-                .ToList();
+                    var result = await connection.QueryAsync<QuestionTypeResponse>(
+                        "GetAllQuestionType",
+                        commandType: CommandType.StoredProcedure
+                    );
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Lỗi khi lấy tất cả QuestionTypes: {ex.Message}");
+                    throw new Exception("Lỗi khi lấy danh sách QuestionTypes từ database.");
+                }
+            }
         }
 
-        public QuestionTypeResponse GetQuestionTypeById(int id)
+        // Lấy QuestionType theo ID
+        public async Task<QuestionTypeResponse> GetQuestionTypeById(int id)
         {
-            var validationResult = ErrorHandling.ValidateId(id);
-            if (!validationResult.IsValid)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.InvalidId));
-
-            var questionType = _context.QuestionType.FirstOrDefault(qt => qt.QuestionTypeID == id);
-            if (questionType == null)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
-
-            return new QuestionTypeResponse
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                QuestionTypeID = questionType.QuestionTypeID,
-                QuestionTypeCode = questionType.QuestionTypeCode,
-                QuestionTypeName = questionType.QuestionTypeName,
-                CreateDate = questionType.CreateDate,
-                UpdateDate = questionType.UpdateDate
-            };
+                await connection.OpenAsync();
+                try
+                {
+                    var result = await connection.QueryFirstOrDefaultAsync<QuestionTypeResponse>(
+                        "GetQuestionTypeById",
+                        new { QuestionTypeID = id },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    if (result == null)
+                    {
+                        _logger.LogWarning($"Không tìm thấy QuestionType với ID: {id}");
+                    }
+                    return result;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Lỗi khi lấy QuestionType theo ID {id}: {ex.Message}");
+                    throw new Exception($"Lỗi khi lấy QuestionType theo ID {id}", ex);
+                }
+            }
         }
 
-        public void CreateQuestionType(QuestionType_CreateReq request)
+        // Tạo mới QuestionType
+        public async Task<bool> CreateQuestionType(QuestionType_CreateReq request)
         {
-            var newQuestionType = new QuestionType
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
-                QuestionTypeCode = request.QuestionTypeCode,
-                QuestionTypeName = request.QuestionTypeName
-            };
-
-            _context.QuestionType.Add(newQuestionType);
-            _context.SaveChanges();
+                await connection.OpenAsync();
+                try
+                {
+                    var result = await connection.ExecuteAsync(
+                        "CreateQuestionType",
+                        new
+                        {
+                            QuestionTypeCode = request.QuestionTypeCode,
+                            QuestionTypeName = request.QuestionTypeName,
+                            CreateDate = DateTime.Now,
+                            UpdateDate = DateTime.Now
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    return result > 0;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Lỗi khi tạo mới QuestionType: {ex.Message}");
+                    throw new Exception("Lỗi khi tạo mới QuestionType", ex);
+                }
+            }
         }
 
-        public void UpdateQuestionType(int id, QuestionType_CreateReq request)
+        // Cập nhật QuestionType
+        public async Task<bool> UpdateQuestionType(int id, QuestionType_UpdateReq request)
         {
-            var questionType = _context.QuestionType.FirstOrDefault(qt => qt.QuestionTypeID == id);
-            if (questionType == null)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
-
-            questionType.QuestionTypeCode = request.QuestionTypeCode;
-            questionType.QuestionTypeName = request.QuestionTypeName;
-            questionType.UpdateDate = DateTime.Now;
-
-            _context.SaveChanges();
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+                try
+                {
+                    var result = await connection.ExecuteAsync(
+                        "UpdateQuestionType",
+                        new
+                        {
+                            QuestionTypeID = id,
+                            QuestionTypeCode = request.QuestionTypeCode,
+                            QuestionTypeName = request.QuestionTypeName,
+                            UpdateDate = DateTime.Now
+                        },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    return result > 0;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Lỗi khi cập nhật QuestionType với ID {id}: {ex.Message}");
+                    throw new Exception("Lỗi khi cập nhật QuestionType", ex);
+                }
+            }
         }
 
-        public void DeleteQuestionType(int id)
+        // Xóa QuestionType
+        public async Task<bool> DeleteQuestionType(int id)
         {
-            var questionType = _context.QuestionType.FirstOrDefault(qt => qt.QuestionTypeID == id);
-            if (questionType == null)
-                throw new Exception(ErrorCodes.GetErrorMessage(ErrorCodes.ResourceNotFound));
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                await connection.OpenAsync();
+                try
+                {
+                    var existingQuestionType = await connection.QueryFirstOrDefaultAsync<QuestionType>(
+                        "GetQuestionTypeById",
+                        new { QuestionTypeID = id },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    if (existingQuestionType == null)
+                    {
+                        _logger.LogWarning($"Không tìm thấy QuestionType với ID: {id}");
+                        return false;
+                    }
 
-            questionType.IsDelete = true;
-            _context.SaveChanges();
+                    var result = await connection.ExecuteAsync(
+                        "DeleteQuestionType",
+                        new { QuestionTypeID = id },
+                        commandType: CommandType.StoredProcedure
+                    );
+                    return result > 0;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"Lỗi khi xóa QuestionType với ID {id}: {ex.Message}");
+                    throw new Exception("Lỗi khi xóa QuestionType", ex);
+                }
+            }
         }
     }
 }

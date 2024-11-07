@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using sourc_backend_stc.Models;
 using sourc_backend_stc.Services;
+using System.Threading.Tasks;
 
 namespace sourc_backend_stc.Controllers
 {
@@ -11,83 +13,117 @@ namespace sourc_backend_stc.Controllers
     public class QuestionTypeController : ControllerBase
     {
         private readonly IQuestionTypeService _questionTypeService;
+        private readonly ILogger<QuestionTypeController> _logger;
 
-        public QuestionTypeController(IQuestionTypeService questionTypeService)
+        public QuestionTypeController(IQuestionTypeService questionTypeService, ILogger<QuestionTypeController> logger)
         {
             _questionTypeService = questionTypeService;
+            _logger = logger;
         }
 
+        // Lấy tất cả QuestionTypes
         [HttpGet("get-all")]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll()
         {
             try
             {
-                var result = _questionTypeService.GetAllQuestionType();
+                var result = await _questionTypeService.GetAllQuestionType();
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                _logger.LogError($"Lỗi khi lấy tất cả QuestionTypes: {ex.Message}");
+                return BadRequest(new { message = "Đã có lỗi xảy ra khi lấy danh sách các loại câu hỏi." });
             }
         }
 
         // Lấy QuestionType theo ID
         [HttpGet("get-by-id/{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
             try
             {
-                var result = _questionTypeService.GetQuestionTypeById(id);
+                var result = await _questionTypeService.GetQuestionTypeById(id);
+                if (result == null)
+                {
+                    return NotFound(new { message = $"Không tìm thấy loại câu hỏi với ID: {id}" });
+                }
                 return Ok(result);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                _logger.LogError($"Lỗi khi lấy QuestionType theo ID {id}: {ex.Message}");
+                return BadRequest(new { message = "Đã có lỗi xảy ra khi lấy loại câu hỏi." });
             }
         }
 
         // Tạo mới QuestionType
         [HttpPost("create")]
-        public IActionResult Create([FromBody] QuestionType_CreateReq req)
+        public async Task<IActionResult> Create([FromBody] QuestionType_CreateReq req)
         {
             try
             {
-                _questionTypeService.CreateQuestionType(req);
-                return Ok(new { message = "Tạo mới thành công." });
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var isCreated = await _questionTypeService.CreateQuestionType(req);
+                if (isCreated)
+                {
+                    return Ok(new { message = "Tạo mới thành công." });
+                }
+                return BadRequest(new { message = "Không thể tạo mới loại câu hỏi." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                _logger.LogError($"Lỗi khi tạo mới QuestionType: {ex.Message}");
+                return BadRequest(new { message = "Đã có lỗi xảy ra khi tạo mới loại câu hỏi." });
             }
         }
 
         // Cập nhật QuestionType
         [HttpPut("update/{id}")]
-        public IActionResult Update(int id, [FromBody] QuestionType_CreateReq req)
+        public async Task<IActionResult> Update(int id, [FromBody] QuestionType_UpdateReq req)
         {
             try
             {
-                _questionTypeService.UpdateQuestionType(id, req);
-                return Ok(new { message = "Cập nhật thành công." });
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var isUpdated = await _questionTypeService.UpdateQuestionType(id, req);
+                if (isUpdated)
+                {
+                    return Ok(new { message = "Cập nhật thành công." });
+                }
+                return NotFound(new { message = $"Không tìm thấy loại câu hỏi với ID: {id}" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                _logger.LogError($"Lỗi khi cập nhật QuestionType với ID {id}: {ex.Message}");
+                return BadRequest(new { message = "Đã có lỗi xảy ra khi cập nhật loại câu hỏi." });
             }
         }
 
         // Xóa QuestionType
         [HttpDelete("delete/{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             try
             {
-                _questionTypeService.DeleteQuestionType(id);
-                return Ok(new { message = "Xóa thành công." });
+                var isDeleted = await _questionTypeService.DeleteQuestionType(id);
+                if (isDeleted)
+                {
+                    return Ok(new { message = "Xóa thành công." });
+                }
+                return NotFound(new { message = $"Không tìm thấy loại câu hỏi với ID: {id}" });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                _logger.LogError($"Lỗi khi xóa QuestionType với ID {id}: {ex.Message}");
+                return BadRequest(new { message = "Đã có lỗi xảy ra khi xóa loại câu hỏi." });
             }
         }
     }
