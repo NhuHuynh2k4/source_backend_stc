@@ -96,7 +96,7 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateMark(int markId, Mark_UpdateReq updateReq)
+        public async Task<bool> UpdateMark(Mark_UpdateReq updateReq)
         {
             if (updateReq == null)
             {
@@ -110,16 +110,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     var result = await connection.ExecuteAsync(
-                        "UpdateMark",
-                        new
-                        {
-                            MarkID = markId,
-                            Result = updateReq.Result,
-                            PassingScore = updateReq.PassingScore,
-                            StudentID = updateReq.StudentID,
-                            ExamID = updateReq.ExamID,
-                            TestID = updateReq.TestID
-                        },
+                        "UpdateMark", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 
@@ -152,7 +143,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu cập nhật thành công
+                    return result==1; // Trả về true nếu cập nhật thành công
                 }
                 catch
                 {

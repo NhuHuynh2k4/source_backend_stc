@@ -31,34 +31,60 @@ namespace sourc_backend_stc.Services
                 new { SubjectsID = subjectId },
                 commandType: CommandType.StoredProcedure);
         }
-
-        public async Task<bool> CreateSubjectAsync(Subject_CreateReq request)
+        public async Task<int> CreateSubjectAsync(Subject_CreateReq request)
         {
-            using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            var parameters = new DynamicParameters();
-            parameters.Add("@SubjectsCode", request.SubjectsCode);
-            parameters.Add("@SubjectsName", request.SubjectsName);
-            return await connection.ExecuteScalarAsync<bool>("CreateSubject", parameters, commandType: CommandType.StoredProcedure);
+            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            {
+                const string query = @"
+            EXEC CreateSubject 
+                @SubjectsCode, @SubjectsName";
+
+                var parameters = new
+                {
+                    request.SubjectsCode,
+                    request.SubjectsName
+                };
+
+                return await connection.ExecuteScalarAsync<int>(query, parameters);
+            }
         }
 
         public async Task<bool> UpdateSubjectAsync(int subjectId, Subject_UpdateReq request)
         {
             using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            var result = await connection.ExecuteAsync(
-                "UpdateSubject",
-                new { SubjectsID = subjectId, request.SubjectsCode, request.SubjectsName },
-                commandType: CommandType.StoredProcedure);
+            const string query = @"
+        EXEC UpdateSubject 
+            @SubjectsID = @SubjectsID, 
+            @SubjectsCode = @SubjectsCode, 
+            @SubjectsName = @SubjectsName";
+
+            var parameters = new
+            {
+                SubjectsID = subjectId,
+                request.SubjectsCode,
+                request.SubjectsName
+            };
+
+            var result = await connection.ExecuteAsync(query, parameters);
             return result > 0;
         }
+
 
         public async Task<bool> DeleteSubjectAsync(int subjectId)
         {
             using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            var result = await connection.ExecuteAsync(
-                "DeleteSubject",
-                new { SubjectsID = subjectId },
-                commandType: CommandType.StoredProcedure);
+            const string query = @"
+        EXEC DeleteSubject 
+            @SubjectsID = @SubjectsID";
+
+            var parameters = new
+            {
+                SubjectsID = subjectId
+            };
+
+            var result = await connection.ExecuteAsync(query, parameters);
             return result > 0;
         }
+
     }
 }

@@ -15,7 +15,7 @@ namespace sourc_backend_stc.Utils
         }
 
         // Phương thức kiểm tra dữ liệu đầu vào và xử lý lỗi nếu không có dữ liệu
-        public static (bool IsSuccess, string Message) HandleIfEmpty(string input)
+        public static (bool IsSuccess, string Message ) HandleIfEmpty(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
             {

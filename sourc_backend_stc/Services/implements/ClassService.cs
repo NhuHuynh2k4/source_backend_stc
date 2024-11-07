@@ -34,17 +34,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure // Xác định là stored procedure
                     );
 
-                    // Chỉ chọn các cột cần thiết mà không bao gồm IsDelete
-                    return result.Select(classInfo => new Class_ReadAllRes
-                    {
-                        ClassID = classInfo.ClassID,
-                        ClassCode = classInfo.ClassCode,
-                        ClassName = classInfo.ClassName,
-                        Session = classInfo.Session,
-                        UpdateDate = classInfo.UpdateDate,
-                        CreateDate = classInfo.CreateDate,
-                        SubjectsID = classInfo.SubjectsID
-                    });
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -99,13 +89,6 @@ namespace sourc_backend_stc.Services
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
-            var newClass = new Class_CreateReq
-            {
-                ClassCode = classDto.ClassCode,
-                ClassName = classDto.ClassName,
-                Session = classDto.Session
-            };
-
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
                 await connection.OpenAsync();
@@ -113,7 +96,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Sử dụng Dapper để gọi stored procedure
-                    var result = await connection.ExecuteAsync("CreateClass", newClass, commandType: CommandType.StoredProcedure);
+                    var result = await connection.ExecuteAsync("CreateClass", classDto, commandType: CommandType.StoredProcedure);
 
                     if (result > 0)
                     {
@@ -154,7 +137,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu cập nhật thành công
+                    return result==1; // Trả về true nếu cập nhật thành công
                 }
                 catch (Exception ex)
                 {
@@ -164,7 +147,7 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateClass(int classId, Class_UpdateReq updateReq)
+        public async Task<bool> UpdateClass(Class_UpdateReq updateReq)
         {
             // Kiểm tra đầu vào hợp lệ
             if (string.IsNullOrWhiteSpace(updateReq.ClassCode) || string.IsNullOrWhiteSpace(updateReq.ClassName))
@@ -180,15 +163,7 @@ namespace sourc_backend_stc.Services
                 {
                     // Gọi stored procedure để cập nhật lớp học
                     var result = await connection.ExecuteAsync(
-                        "UpdateClass",
-                        new
-                        {
-                            ClassID = classId,                   // ID lấy từ tham số hàm
-                            ClassCode = updateReq.ClassCode,     // Lấy dữ liệu từ updateReq
-                            ClassName = updateReq.ClassName,
-                            Session = updateReq.Session,
-                            SubjectsID = updateReq.SubjectsID
-                        },
+                        "UpdateClass", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 

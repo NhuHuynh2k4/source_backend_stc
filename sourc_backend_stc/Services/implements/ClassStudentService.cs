@@ -118,8 +118,8 @@ namespace sourc_backend_stc.Services
                         "UpdateClassStudent",
                         new
                         {
-                            Class_StudentID = id, // Truyền ID của ClassStudent từ tham số
-                            ClassID = updateReq.ClassID,
+                            Class_StudentID = id, // Truyền tham số Class_StudentID
+                            ClassID = updateReq.ClassID, // Truyền tham số ClassID
                             StudentID = updateReq.StudentID
                         },
                         commandType: CommandType.StoredProcedure
