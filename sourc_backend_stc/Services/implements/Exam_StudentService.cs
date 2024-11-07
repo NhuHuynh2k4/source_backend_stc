@@ -40,6 +40,12 @@ namespace sourc_backend_stc.Services
 
                         Exam_StudentID = Exam_StudentInfo.Exam_StudentID,
                         ExamID = Exam_StudentInfo.ExamID,
+                        ExamCode = Exam_StudentInfo.ExamCode,
+                        ExamName = Exam_StudentInfo.ExamName,
+                        Duration = Exam_StudentInfo.Duration,
+                        NumberOfQuestions = Exam_StudentInfo.NumberOfQuestions,
+                        TotalMarks = Exam_StudentInfo.TotalMarks,
+                        TestID = Exam_StudentInfo.TestID,
                         StudentID = Exam_StudentInfo.StudentID,
                         StudentCode = Exam_StudentInfo.StudentCode,
                         StudentName = Exam_StudentInfo.StudentName,
@@ -80,7 +86,7 @@ namespace sourc_backend_stc.Services
                     // Sử dụng Dapper để gọi stored procedure
                     var result = await connection.QueryFirstOrDefaultAsync<Exam_StudentRes>(
                         "GetExam_StudentByID",  // Tên stored procedure
-                        new {Exam_StudentID = Exam_StudentId },  // Tham số đầu vào
+                        new { Exam_StudentID = Exam_StudentId },  // Tham số đầu vào
                         commandType: CommandType.StoredProcedure  // Xác định là stored procedure
                     );
 
@@ -98,19 +104,19 @@ namespace sourc_backend_stc.Services
             // Kiểm tra đầu vào
             var (isValidStudentID, messageStudentID) = ErrorHandling.ValidateId(createReq.StudentID);
             var (isValidExamID, messageExamID) = ErrorHandling.ValidateId(createReq.ExamID);
-            
+
 
             // Kiểm tra tất cả các trường đầu vào
-            if (!isValidStudentID || !isValidExamID )
+            if (!isValidStudentID || !isValidExamID)
             {
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
             var newExam_Student = new Exam_Student_CreateReq
             {
-                        ExamID = createReq.ExamID,
-                        StudentID = createReq.StudentID
-                       
+                ExamID = createReq.ExamID,
+                StudentID = createReq.StudentID
+
             };
 
             using (var connection = DatabaseConnection.GetConnection(_configuration))
@@ -177,10 +183,10 @@ namespace sourc_backend_stc.Services
         {
             var (isValidStudentID, messageStudentID) = ErrorHandling.ValidateId(updateReq.StudentID);
             var (isValidExamID, messageExamID) = ErrorHandling.ValidateId(updateReq.ExamID);
-            
+
 
             // Kiểm tra tất cả các trường đầu vào
-            if (!isValidStudentID || !isValidExamID )
+            if (!isValidStudentID || !isValidExamID)
             {
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
@@ -194,10 +200,10 @@ namespace sourc_backend_stc.Services
                     var result = await connection.ExecuteAsync(
                         "UpdateExam_Student",
                         new
-                        {   
+                        {
                             Exam_StudentID = Exam_StudentId,             // ID lấy từ tham số hàm
-                            ExamID  = updateReq.ExamID,                  // Lấy dữ liệu từ updateReq
-                            StudentID = updateReq.StudentID                  
+                            ExamID = updateReq.ExamID,                  // Lấy dữ liệu từ updateReq
+                            StudentID = updateReq.StudentID
                         },
                         commandType: CommandType.StoredProcedure
                     );
