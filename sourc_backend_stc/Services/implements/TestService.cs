@@ -35,16 +35,7 @@ namespace sourc_backend_stc.Services
                     );
 
                     // Chỉ chọn các cột cần thiết mà không bao gồm IsDelete
-                    return result.Select(testInfo => new Test_ReadAllRes
-                    {
-                        TestID = testInfo.TestID,
-                        TestCode = testInfo.TestCode,
-                        TestName = testInfo.TestName,
-                        NumberOfQuestions = testInfo.NumberOfQuestions,
-                        UpdateDate = testInfo.UpdateDate,
-                        CreateDate = testInfo.CreateDate,
-                        SubjectsID = testInfo.SubjectsID
-                    });
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -99,13 +90,6 @@ namespace sourc_backend_stc.Services
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
-            var newTest = new Test_CreateReq
-            {
-                TestCode = testDto.TestCode,
-                TestName = testDto.TestName,
-                NumberOfQuestions = testDto.NumberOfQuestions,
-                SubjectsID = testDto.SubjectsID
-            };
 
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
@@ -114,7 +98,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Sử dụng Dapper để gọi stored procedure
-                    var result = await connection.ExecuteAsync("CreateTest", newTest, commandType: CommandType.StoredProcedure);
+                    var result = await connection.ExecuteAsync("CreateTest", testDto, commandType: CommandType.StoredProcedure);
 
                     if (result > 0)
                     {
@@ -165,7 +149,7 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateTest(int testId, Test_UpdateReq updateReq)
+        public async Task<bool> UpdateTest(Test_UpdateReq updateReq)
         {
             // Kiểm tra đầu vào hợp lệ
             if (string.IsNullOrWhiteSpace(updateReq.TestCode) || string.IsNullOrWhiteSpace(updateReq.TestName))
@@ -181,15 +165,7 @@ namespace sourc_backend_stc.Services
                 {
                     // Gọi stored procedure để cập nhật lớp học
                     var result = await connection.ExecuteAsync(
-                        "UpdateTest",
-                        new
-                        {
-                            TestID = testId,                   // ID lấy từ tham số hàm
-                            TestCode = updateReq.TestCode,     // Lấy dữ liệu từ updateReq
-                            TestName = updateReq.TestName,
-                            NumberOfQuestions = updateReq.NumberOfQuestions,
-                            SubjectsID = updateReq.SubjectsID
-                        },
+                        "UpdateTest", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 

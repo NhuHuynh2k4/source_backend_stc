@@ -77,15 +77,15 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPut("update/{testQuestionId}")]
-        public async Task<IActionResult> UpdateTestQuestion(int testQuestionId, [FromBody] TestQuestion_UpdateReq updateReq)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateTestQuestion([FromBody] TestQuestion_UpdateReq updateReq)
         {
             if (updateReq == null || updateReq.TestID <=0 || updateReq.QuestionID<=0)
             {
                 return BadRequest(new {status = 400, message = "Dữ liệu cập nhật không hợp lệ."});
             }
 
-            var isUpdated = await _testQuestionService.UpdateTestQuestion(testQuestionId, updateReq);
+            var isUpdated = await _testQuestionService.UpdateTestQuestion(updateReq);
 
             if (isUpdated)
             {

@@ -77,15 +77,15 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPut("update/{answerId}")]
-        public async Task<IActionResult> UpdateAnswer(int answerId, [FromBody] Answer_UpdateReq updateReq)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateAnswer([FromBody] Answer_UpdateReq updateReq)
         {
             if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.AnswerName) || string.IsNullOrWhiteSpace(updateReq.AnswerTextContent))
             {
                 return BadRequest(new {status = 400, message = "Dữ liệu cập nhật không hợp lệ."});
             }
 
-            var isUpdated = await _answerService.UpdateAnswer(answerId, updateReq);
+            var isUpdated = await _answerService.UpdateAnswer(updateReq);
 
             if (isUpdated)
             {

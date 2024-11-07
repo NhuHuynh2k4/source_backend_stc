@@ -18,7 +18,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Lấy thông tin ClassStudent theo ID
-        [HttpGet("get-by-id/{Class_StudentID}")]
+        [HttpGet("get-by-id/{id}")]
         public async Task<IActionResult> GetClassStudentByID(int id)
         {
             try

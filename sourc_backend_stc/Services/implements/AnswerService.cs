@@ -10,7 +10,7 @@ using sourc_backend_stc.Utils;
 namespace sourc_backend_stc.Services
 {
     public class AnswerService : IAnswerService
-{
+    {
         private readonly IConfiguration _configuration;
 
         public AnswerService(IConfiguration configuration)
@@ -35,16 +35,7 @@ namespace sourc_backend_stc.Services
                     );
 
                     // Chỉ chọn các cột cần thiết
-                    return result.Select(answerInfo => new Answer_ReadAllRes
-                    {
-                        AnswerID = answerInfo.AnswerID,
-                        AnswerName = answerInfo.AnswerName,
-                        AnswerTextContent = answerInfo.AnswerTextContent,
-                        AnswerImgContent = answerInfo.AnswerImgContent,
-                        IsTrue = answerInfo.IsTrue,
-                        QuestionID = answerInfo.QuestionID,
-                        QuestionName = answerInfo.QuestionName
-                    });
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -95,19 +86,19 @@ namespace sourc_backend_stc.Services
             var (isValidAnswerName, messageAnswerName) = ErrorHandling.HandleIfEmpty(answerDto.AnswerName);
             var (isValidQuestionID, messageQuestionID) = ErrorHandling.ValidateId(answerDto.QuestionID);
 
-            if (!isValidAnswerName || !isValidAnswerTextContent || answerDto.IsTrue!=true || answerDto.IsTrue!=false )
+            if (!isValidAnswerName || !isValidAnswerTextContent || !isValidQuestionID)
             {
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
-            var newAnswer = new Answer_CreateReq
-            {
-                AnswerName = answerDto.AnswerName,
-                AnswerTextContent = answerDto.AnswerTextContent,
-                AnswerImgContent = answerDto.AnswerImgContent,
-                IsTrue = answerDto.IsTrue,
-                QuestionID = answerDto.QuestionID
-            };
+            // var newAnswer = new Answer_CreateReq
+            // {
+            //     AnswerName = answerDto.AnswerName,
+            //     AnswerTextContent = answerDto.AnswerTextContent,
+            //     AnswerImgContent = answerDto.AnswerImgContent,
+            //     IsTrue = answerDto.IsTrue,
+            //     QuestionID = answerDto.QuestionID
+            // };
 
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
@@ -116,7 +107,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Sử dụng Dapper để gọi stored procedure
-                    var result = await connection.ExecuteAsync("CreateAnswer", newAnswer, commandType: CommandType.StoredProcedure);
+                    var result = await connection.ExecuteAsync("CreateAnswer", answerDto, commandType: CommandType.StoredProcedure);
 
                     if (result > 0)
                     {
@@ -157,7 +148,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu cập nhật thành công
+                    return result == 1; // Trả về true nếu cập nhật thành công
                 }
                 catch (Exception ex)
                 {
@@ -167,7 +158,7 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateAnswer(int answerId, Answer_UpdateReq updateReq)
+        public async Task<bool> UpdateAnswer(Answer_UpdateReq updateReq)
         {
             // Kiểm tra đầu vào hợp lệ
             if (string.IsNullOrWhiteSpace(updateReq.AnswerTextContent) || string.IsNullOrWhiteSpace(updateReq.AnswerName))
@@ -183,16 +174,7 @@ namespace sourc_backend_stc.Services
                 {
                     // Gọi stored procedure để cập nhật Answer
                     var result = await connection.ExecuteAsync(
-                        "UpdateAnswer",
-                        new
-                        {
-                            AnswerID = answerId,                   // ID lấy từ tham số hàm
-                            AnswerName = updateReq.AnswerName,
-                            AnswerTextContent = updateReq.AnswerTextContent,     // Lấy dữ liệu từ updateReq
-                            AnswerImgContent = updateReq.AnswerImgContent,
-                            IsTrue = updateReq.IsTrue,
-                            QuestionID = updateReq.QuestionID,
-                        },
+                        "UpdateAnswer", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 
@@ -205,5 +187,33 @@ namespace sourc_backend_stc.Services
                 }
             }
         }
+
+        // public async Task<bool> UploadAnswerImage(int answerId, IFormFile imageFile)
+        // {
+        //     if (imageFile == null || imageFile.Length == 0)
+        //     {
+        //         return false; // Return false if no file is provided
+        //     }
+
+        //     // Define the path to save the file (adjust the path as needed)
+        //     var filePath = Path.Combine("wwwroot/images", $"{answerId}_{imageFile.FileName}");
+
+        //     try
+        //     {
+        //         // Save the file to the specified path
+        //         using (var stream = new FileStream(filePath, FileMode.Create))
+        //         {
+        //             await imageFile.CopyToAsync(stream);
+        //         }
+
+        //         // Optionally, update the database with the file path if needed (not shown here)
+        //         return true; 
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         return false; 
+        //     }
+        // }
+
     }
 }

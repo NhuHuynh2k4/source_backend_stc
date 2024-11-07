@@ -29,26 +29,13 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Gọi stored procedure để lấy tất cả các lớp học không bị xoá
-                    var result = await connection.QueryAsync<Student>(
+                    var result = await connection.QueryAsync<Student_ReadAllRes>(
                         "GetAllStudent", // Tên stored procedure
                         commandType: CommandType.StoredProcedure // Xác định là stored procedure
                     );
 
 
-                    return result.Select(StudentInfo => new Student_ReadAllRes
-                    {
-                        StudentID = StudentInfo.StudentID,
-                        StudentCode = StudentInfo.StudentCode,
-                        StudentName = StudentInfo.StudentName,
-                        Gender = StudentInfo.Gender,
-                        NumberPhone = StudentInfo.NumberPhone,
-                        Address = StudentInfo.Address,
-                        Email = StudentInfo.Email,
-                        BirthdayDate = StudentInfo.BirthdayDate,
-                        UpdateDate = StudentInfo.UpdateDate,
-                        CreateDate = StudentInfo.CreateDate,
-
-                    });
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -106,18 +93,7 @@ namespace sourc_backend_stc.Services
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
-            var hashedPassword = PasswordHasher.HashPassword(createReq.Password);
-            var newStudent = new Student_CreateReq
-            {
-                StudentCode = createReq.StudentCode,
-                StudentName = createReq.StudentName,
-                Password = hashedPassword,
-                Gender = createReq.Gender,
-                NumberPhone = createReq.NumberPhone,
-                Address = createReq.Address,
-                Email = createReq.Email,
-                BirthdayDate = createReq.BirthdayDate
-            };
+            createReq.Password = PasswordHasher.HashPassword(createReq.Password);
 
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
@@ -126,7 +102,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Sử dụng Dapper để gọi stored procedure
-                    var result = await connection.ExecuteAsync("CreateStudent", newStudent, commandType: CommandType.StoredProcedure);
+                    var result = await connection.ExecuteAsync("CreateStudent", createReq, commandType: CommandType.StoredProcedure);
 
                     if (result > 0)
                     {
@@ -179,13 +155,8 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateStudent(int studentId, Student_UpdateReq updateReq)
+        public async Task<bool> UpdateStudent(Student_UpdateReq updateReq)
         {
-            // var (isValid, errorMessage) = ErrorHandling.ValidateId(studentId);
-            // if (!isValid)
-            // {
-            //     return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu ID không hợp lệ
-            // }
             // Kiểm tra đầu vào
             var (isValidCode, messageCode) = ErrorHandling.HandleIfEmpty(updateReq.StudentCode);
             var (isValidName, messageName) = ErrorHandling.HandleIfEmpty(updateReq.StudentName);
@@ -207,20 +178,7 @@ namespace sourc_backend_stc.Services
                 {
                     // Gọi stored procedure để cập nhật lớp học
                     var result = await connection.ExecuteAsync(
-                        "UpdateStudent",
-                        new
-                        {
-                            StudentID = studentId,                   // ID lấy từ tham số hàm
-                            StudentCode = updateReq.StudentCode,     // Lấy dữ liệu từ updateReq
-                            StudentName = updateReq.StudentName,
-                            Gender = updateReq.Gender,
-                            NumberPhone = updateReq.NumberPhone,
-                            Address = updateReq.Address,
-                            Email = updateReq.Email,
-                            BirthdayDate = updateReq.BirthdayDate
-
-
-                        },
+                        "UpdateStudent", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 

@@ -7,7 +7,7 @@ namespace sourc_backend_stc.Services
     public interface IExamService
     {
         Task<bool> CreateExam(Exam_CreateReq examDto);
-        Task<bool> UpdateExam(int examId, Exam_UpdateReq updateReq);
+        Task<bool> UpdateExam(Exam_UpdateReq updateReq);
         Task<bool> DeleteExam(int examId);
         Task<Exam_ReadAllRes> GetExamById(int examId);
         Task<IEnumerable<Exam_ReadAllRes>> GetAllExams();

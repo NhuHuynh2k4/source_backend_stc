@@ -80,9 +80,9 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPut("update/{studentId}")]
+        [HttpPut("update")]
         [Authorize]
-        public async Task<IActionResult> UpdateClassUpdateStudent(int studentId, [FromBody] Student_UpdateReq updateReq)
+        public async Task<IActionResult> UpdateClassUpdateStudent([FromBody] Student_UpdateReq updateReq)
         {
             if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.StudentCode)
             || string.IsNullOrWhiteSpace(updateReq.StudentName)
@@ -92,7 +92,7 @@ namespace sourc_backend_stc.Controllers
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
-            var isUpdated = await _studentService.UpdateStudent(studentId, updateReq);
+            var isUpdated = await _studentService.UpdateStudent(updateReq);
 
             if (isUpdated)
             {

@@ -70,15 +70,15 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Cập nhật điểm theo ID
-        [HttpPut("update/{markId}")]
-        public async Task<IActionResult> UpdateMark(int markId, [FromBody] Mark_UpdateReq updateReq)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateMark([FromBody] Mark_UpdateReq updateReq)
         {
             if (updateReq == null)
             {
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
-            var isUpdated = await _markService.UpdateMark(markId, updateReq);
+            var isUpdated = await _markService.UpdateMark(updateReq);
 
             if (isUpdated)
             {
