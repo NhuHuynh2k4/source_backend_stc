@@ -82,9 +82,7 @@ namespace sourc_backend_stc.Services
                         new
                         {
                             QuestionTypeCode = request.QuestionTypeCode,
-                            QuestionTypeName = request.QuestionTypeName,
-                            CreateDate = DateTime.Now,
-                            UpdateDate = DateTime.Now
+                            QuestionTypeName = request.QuestionTypeName
                         },
                         commandType: CommandType.StoredProcedure
                     );
@@ -99,7 +97,7 @@ namespace sourc_backend_stc.Services
         }
 
         // Cập nhật QuestionType
-        public async Task<bool> UpdateQuestionType(int id, QuestionType_UpdateReq request)
+        public async Task<bool> UpdateQuestionType(QuestionType_UpdateReq request)
         {
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
@@ -110,10 +108,9 @@ namespace sourc_backend_stc.Services
                         "UpdateQuestionType",
                         new
                         {
-                            QuestionTypeID = id,
+                            QuestionTypeID = request.QuestionTypeID,
                             QuestionTypeCode = request.QuestionTypeCode,
-                            QuestionTypeName = request.QuestionTypeName,
-                            UpdateDate = DateTime.Now
+                            QuestionTypeName = request.QuestionTypeName
                         },
                         commandType: CommandType.StoredProcedure
                     );
@@ -121,11 +118,12 @@ namespace sourc_backend_stc.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError($"Lỗi khi cập nhật QuestionType với ID {id}: {ex.Message}");
+                    _logger.LogError($"Lỗi khi cập nhật QuestionType với ID {request.QuestionTypeID}: {ex.Message}");
                     throw new Exception("Lỗi khi cập nhật QuestionType", ex);
                 }
             }
         }
+
 
         // Xóa QuestionType
         public async Task<bool> DeleteQuestionType(int id)
