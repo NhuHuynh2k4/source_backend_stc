@@ -18,7 +18,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Lấy thông tin ClassStudent theo ID
-        [HttpGet("get-by-id/{id}")]
+        [HttpGet("get-by-id/{Class_StudentID}")]
         public async Task<IActionResult> GetClassStudentByID(int id)
         {
             try
@@ -53,13 +53,23 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-
         // Tạo mới ClassStudent
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromBody] ClassStudent_CreateReq request)
         {
             try
             {
+                // Kiểm tra thông tin đầu vào
+                if (request.ClassID <= 0)
+                {
+                    return BadRequest(new { message = "ID lớp học không hợp lệ." });
+                }
+
+                if (request.StudentID <= 0)
+                {
+                    return BadRequest(new { message = "ID sinh viên không hợp lệ." });
+                }
+
                 var success = await _classStudentService.CreateClassStudent(request);
                 if (!success) return BadRequest(new { message = "Tạo mới thất bại." });
                 return Ok(new { message = "Tạo mới thành công." });
@@ -71,12 +81,29 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Cập nhật ClassStudent
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] ClassStudent_UpdateReq updateReq)
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] ClassStudent_UpdateReq updateReq)
         {
             try
             {
-                var success = await _classStudentService.UpdateClassStudent(id, updateReq);
+                // Kiểm tra thông tin đầu vào
+                if (updateReq.Class_StudentID <= 0)
+                {
+                    return BadRequest(new { message = "ID không hợp lệ." });
+                }
+
+                if (updateReq.ClassID <= 0)
+                {
+                    return BadRequest(new { message = "ID lớp học không hợp lệ." });
+                }
+
+                if (updateReq.StudentID <= 0)
+                {
+                    return BadRequest(new { message = "ID sinh viên không hợp lệ." });
+                }
+                
+
+                var success = await _classStudentService.UpdateClassStudent(updateReq.Class_StudentID, updateReq);
                 if (!success) return BadRequest(new { message = "Cập nhật thất bại." });
                 return Ok(new { message = "Cập nhật thành công." });
             }
@@ -87,7 +114,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Xóa ClassStudent
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("delete/{Class_StudentID}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
