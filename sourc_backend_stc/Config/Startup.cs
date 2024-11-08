@@ -9,11 +9,11 @@ namespace sourc_backend_stc.Config
 {
     public class Startup
     {
-        public IConfiguration Configuration;
+        public IConfiguration _configuration;
 
         public Startup(IConfiguration configuration)
         {
-            Configuration = configuration;
+            _configuration = configuration;
         }
 
         public void ConfigureServices(IServiceCollection services)

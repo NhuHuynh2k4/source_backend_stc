@@ -54,7 +54,6 @@ namespace sourc_backend_stc.Controllers
         }
 
 
-        // // Lấy Class theo ID
         [HttpGet("get-by-id/{classId}")]
         public async Task<IActionResult> GetClassById(int classId)
         {
@@ -78,15 +77,15 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPut("update/{classId}")]
-        public async Task<IActionResult> UpdateClass(int classId, [FromBody] Class_UpdateReq updateReq)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateClass([FromBody] Class_UpdateReq updateReq)
         {
             if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.ClassCode) || string.IsNullOrWhiteSpace(updateReq.ClassName))
             {
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
-            var isUpdated = await _classService.UpdateClass(classId, updateReq);
+            var isUpdated = await _classService.UpdateClass(updateReq);
 
             if (isUpdated)
             {

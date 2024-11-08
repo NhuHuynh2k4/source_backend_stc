@@ -2,6 +2,7 @@ namespace sourc_backend_stc.Models
 {
     public class Question_UpdateReq
     {
+        public int QuestionID { get; set; }
         public string QuestionCode { get; set; }
         public string QuestionName { get; set; }
         public string QuestionTextContent { get; set; }

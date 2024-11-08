@@ -2,7 +2,7 @@ namespace sourc_backend_stc.Models
 {
     public class Student_UpdateReq
     {
-        
+        public int StudentID { get; set; }
         public string StudentCode { get; set; }
         public string StudentName { get; set; }
         public bool Gender{ get; set;}

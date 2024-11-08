@@ -70,15 +70,15 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Cập nhật kỳ thi theo ID
-        [HttpPut("update/{examId}")]
-        public async Task<IActionResult> UpdateExam(int examId, [FromBody] Exam_UpdateReq updateReq)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateExam([FromBody] Exam_UpdateReq updateReq)
         {
             if (updateReq == null)
             {
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
-            var isUpdated = await _examService.UpdateExam(examId, updateReq);
+            var isUpdated = await _examService.UpdateExam(updateReq);
 
             if (isUpdated)
             {

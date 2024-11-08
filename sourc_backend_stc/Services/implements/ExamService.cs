@@ -93,7 +93,7 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateExam(int examId, Exam_UpdateReq updateReq)
+        public async Task<bool> UpdateExam(Exam_UpdateReq updateReq)
         {
             if (updateReq == null)
             {
@@ -107,18 +107,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     var result = await connection.ExecuteAsync(
-                        "UpdateExam",
-                        new
-                        {
-                            ExamID = examId,
-                            ExamCode = updateReq.ExamCode,
-                            ExamName = updateReq.ExamName,
-                            ExamDate = updateReq.ExamDate,
-                            Duration = updateReq.Duration,
-                            NumberOfQuestions = updateReq.NumberOfQuestions,
-                            TotalMarks = updateReq.TotalMarks,
-                            TestID = updateReq.TestID
-                        },
+                        "UpdateExam",updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 
@@ -151,7 +140,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu cập nhật thành công
+                    return result==1; // Trả về true nếu cập nhật thành công
                 }
                 catch
                 {

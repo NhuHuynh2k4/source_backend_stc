@@ -34,15 +34,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure // Xác định là stored procedure
                     );
 
-                    // Chỉ chọn các cột cần thiết mà không bao gồm IsDelete
-                    return result.Select(testQuestionInfo => new TestQuestion_ReadAllRes
-                    {
-                        Test_QuestionID = testQuestionInfo.Test_QuestionID,
-                        QuestionID = testQuestionInfo.QuestionID,
-                        QuestionName = testQuestionInfo.QuestionName,
-                        TestID = testQuestionInfo.TestID,
-                        TestName = testQuestionInfo.TestName
-                    });
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -97,13 +89,6 @@ namespace sourc_backend_stc.Services
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
-            var newTestQuestion = new TestQuestion_CreateReq
-            {
-                
-                QuestionID = testQuestionDto.QuestionID,
-                TestID = testQuestionDto.TestID
-            };
-
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
                 await connection.OpenAsync();
@@ -111,7 +96,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Sử dụng Dapper để gọi stored procedure
-                    var result = await connection.ExecuteAsync("CreateTestQuestion", newTestQuestion, commandType: CommandType.StoredProcedure);
+                    var result = await connection.ExecuteAsync("CreateTestQuestion", testQuestionDto, commandType: CommandType.StoredProcedure);
 
                     if (result > 0)
                     {
@@ -144,7 +129,7 @@ namespace sourc_backend_stc.Services
                 await connection.OpenAsync();
 
                 try
-                {
+                { 
                     // Đánh dấu IsDeleted là true cho bản ghi có ID tương ứng
                     var result = await connection.ExecuteAsync(
                         "DeleteTestQuestion",
@@ -152,7 +137,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu cập nhật thành công
+                    return result == 1; // Trả về true nếu cập nhật thành công
                 }
                 catch (Exception ex)
                 {
@@ -162,7 +147,7 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateTestQuestion(int testQuestionId, TestQuestion_UpdateReq updateReq)
+        public async Task<bool> UpdateTestQuestion(TestQuestion_UpdateReq updateReq)
         {
             // Kiểm tra đầu vào hợp lệ
             if (updateReq.QuestionID <= 0 || updateReq.TestID <=0)
@@ -178,13 +163,7 @@ namespace sourc_backend_stc.Services
                 {
                     // Gọi stored procedure để cập nhật TestQuestion
                     var result = await connection.ExecuteAsync(
-                        "UpdateTestQuestion",
-                        new
-                        {
-                            Test_QuestionID = testQuestionId,
-                            QuestionID = updateReq.QuestionID,
-                            TestID = updateReq.TestID
-                        },
+                        "UpdateTestQuestion", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 

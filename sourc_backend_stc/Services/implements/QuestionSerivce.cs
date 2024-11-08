@@ -43,10 +43,13 @@ namespace sourc_backend_stc.Services
             using (var connection = new SqlConnection(_connectionString))
             {
                 const string query = @"
-                    EXEC CreateQuestion 
-                        @QuestionCode, @QuestionName, 
-                        @QuestionTextContent, @QuestionImgContent, 
-                        @SubjectsID, @QuestionTypeID";
+            EXEC CreateQuestion 
+                @QuestionCode = @QuestionCode, 
+                @QuestionName = @QuestionName, 
+                @QuestionTextContent = @QuestionTextContent, 
+                @QuestionImgContent = @QuestionImgContent, 
+                @SubjectsID = @SubjectsID, 
+                @QuestionTypeID = @QuestionTypeID";
 
                 var parameters = new
                 {
@@ -62,15 +65,20 @@ namespace sourc_backend_stc.Services
             }
         }
 
+
         public async Task<bool> UpdateQuestion(int questionId, Question_UpdateReq request)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
                 const string query = @"
-                    EXEC UpdateQuestion 
-                        @QuestionID, @QuestionCode, @QuestionName, 
-                        @QuestionTextContent, @QuestionImgContent, 
-                        @SubjectsID, @QuestionTypeID";
+            EXEC UpdateQuestion 
+                @QuestionID = @QuestionID, 
+                @QuestionCode = @QuestionCode, 
+                @QuestionName = @QuestionName, 
+                @QuestionTextContent = @QuestionTextContent, 
+                @QuestionImgContent = @QuestionImgContent, 
+                @SubjectsID = @SubjectsID, 
+                @QuestionTypeID = @QuestionTypeID";
 
                 var parameters = new
                 {
@@ -88,14 +96,18 @@ namespace sourc_backend_stc.Services
             }
         }
 
+
         public async Task<bool> DeleteQuestion(int questionId)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
-                const string query = "EXEC DeleteQuestion @QuestionID";
-                var rowsAffected = await connection.ExecuteAsync(query, new { QuestionID = questionId });
+                const string query = "EXEC DeleteQuestion @QuestionID = @QuestionID";
+                var parameters = new { QuestionID = questionId };
+
+                var rowsAffected = await connection.ExecuteAsync(query, parameters);
                 return rowsAffected > 0;
             }
         }
+
     }
 }
