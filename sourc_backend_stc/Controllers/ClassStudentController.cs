@@ -35,23 +35,23 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy tất cả ClassStudents
         [HttpGet("get-all")]
-        public IActionResult GetAll()
+public async Task<IActionResult> GetAll()
+{
+    try
+    {
+        var result = await _classStudentService.GetAllClassStudent();
+        if (result == null || !result.Any())
         {
-            try
-            {
-                var result = _classStudentService.GetAllClassStudent().Result;
-                if (result == null || !result.Any())
-                {
-                    return NotFound(new { message = "Không có bản ghi nào." });
-                }
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                // Log chi tiết lỗi vào log server (có thể sử dụng logging như NLog, Serilog)
-                return StatusCode(500, new { message = "Lỗi khi lấy danh sách ClassStudent", error = ex.Message });
-            }
+            return NotFound(new { message = "Không có bản ghi nào." });
         }
+        return Ok(result);
+    }
+    catch (Exception ex)
+    {
+        return StatusCode(500, new { message = "Lỗi khi lấy danh sách ClassStudent", error = ex.Message });
+    }
+}
+
 
         // Tạo mới ClassStudent
         [HttpPost("create")]
@@ -114,7 +114,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Xóa ClassStudent
-        [HttpDelete("delete/{Class_StudentID}")]
+        [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try

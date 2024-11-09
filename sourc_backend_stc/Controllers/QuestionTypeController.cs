@@ -83,8 +83,8 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Cập nhật QuestionType
-        [HttpPut("update/{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] QuestionType_UpdateReq req)
+        [HttpPut("update")]
+        public async Task<IActionResult> Update([FromBody] QuestionType_UpdateReq req)
         {
             try
             {
@@ -93,19 +93,20 @@ namespace sourc_backend_stc.Controllers
                     return BadRequest(ModelState);
                 }
 
-                var isUpdated = await _questionTypeService.UpdateQuestionType(id, req);
+                var isUpdated = await _questionTypeService.UpdateQuestionType(req);
                 if (isUpdated)
                 {
                     return Ok(new { message = "Cập nhật thành công." });
                 }
-                return NotFound(new { message = $"Không tìm thấy loại câu hỏi với ID: {id}" });
+                return NotFound(new { message = $"Không tìm thấy loại câu hỏi với ID: {req.QuestionTypeID}" });
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Lỗi khi cập nhật QuestionType với ID {id}: {ex.Message}");
-                return BadRequest(new { message = "Đã có lỗi xảy ra khi cập nhật loại câu hỏi." });
+                _logger.LogError($"Lỗi khi cập nhật QuestionType với ID {req.QuestionTypeID}: {ex.Message}");
+                return StatusCode(500, new { message = "Đã có lỗi xảy ra khi cập nhật loại câu hỏi." });
             }
         }
+
 
         // Xóa QuestionType
         [HttpDelete("delete/{id}")]
