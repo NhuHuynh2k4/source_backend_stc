@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sourc_backend_stc.Models;
 using sourc_backend_stc.Services;
@@ -7,7 +6,6 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class QuestionController : ControllerBase
     {
         private readonly IQuestionService _questionService;
@@ -43,35 +41,71 @@ namespace sourc_backend_stc.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateQuestion([FromBody] Question_CreateReq request)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.QuestionCode) || string.IsNullOrWhiteSpace(request.QuestionName))
+            if (request == null)
                 return BadRequest("Dữ liệu câu hỏi không hợp lệ.");
+
+            // Check required fields
+            if (string.IsNullOrWhiteSpace(request.QuestionCode))
+                return BadRequest("Mã câu hỏi không được để trống.");
+            if (string.IsNullOrWhiteSpace(request.QuestionName))
+                return BadRequest("Tên câu hỏi không được để trống.");
+            if (string.IsNullOrWhiteSpace(request.QuestionTextContent))
+                return BadRequest("Nội dung văn bản câu hỏi không được để trống.");
+            if (request.SubjectsID <= 0)
+                return BadRequest("ID môn học không hợp lệ.");
+            if (request.QuestionTypeID <= 0)
+                return BadRequest("ID loại câu hỏi không hợp lệ.");
+
+            // Optional field checks
+            if (string.IsNullOrWhiteSpace(request.QuestionImgContent))
+                request.QuestionImgContent = null; // Set to null if not provided
 
             try
             {
-                await _questionService.CreateQuestion(request); // Đảm bảo gọi hàm này là async
+                await _questionService.CreateQuestion(request);
                 return Ok(new { message = "Câu hỏi đã tạo thành công." });
             }
             catch (Exception ex)
             {
-                // Trả về thông báo lỗi nếu có ngoại lệ xảy ra
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
 
         // Cập nhật câu hỏi
         [HttpPut("update/{questionId}")]
         public async Task<IActionResult> UpdateQuestion(int questionId, [FromBody] Question_UpdateReq request)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.QuestionCode) || string.IsNullOrWhiteSpace(request.QuestionName))
+            if (request == null)
                 return BadRequest("Dữ liệu cập nhật câu hỏi không hợp lệ.");
 
-            var isUpdated = await _questionService.UpdateQuestion(questionId, request);
-            if (isUpdated)
-                return Ok("Cập nhật câu hỏi thành công.");
+            // Validate required fields
+            if (string.IsNullOrWhiteSpace(request.QuestionCode))
+                return BadRequest("Mã câu hỏi không được để trống.");
+            if (string.IsNullOrWhiteSpace(request.QuestionName))
+                return BadRequest("Tên câu hỏi không được để trống.");
+            if (string.IsNullOrWhiteSpace(request.QuestionTextContent))
+                return BadRequest("Nội dung văn bản câu hỏi không được để trống.");
+            if (request.SubjectsID <= 0)
+                return BadRequest("ID môn học không hợp lệ.");
+            if (request.QuestionTypeID <= 0)
+                return BadRequest("ID loại câu hỏi không hợp lệ.");
 
-            return NotFound("Không tìm thấy câu hỏi hoặc cập nhật thất bại.");
+            try
+            {
+                var isUpdated = await _questionService.UpdateQuestion(questionId, request);
+                if (isUpdated)
+                    return Ok("Cập nhật câu hỏi thành công.");
+
+                return NotFound("Không tìm thấy câu hỏi hoặc cập nhật thất bại.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
 
         // Xóa mềm câu hỏi
         [HttpDelete("delete/{questionId}")]
