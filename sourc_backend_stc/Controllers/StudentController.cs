@@ -6,6 +6,7 @@ using Dapper;
 using sourc_backend_stc.Services;
 using sourc_backend_stc.Utils;
 using Microsoft.AspNetCore.Authorization;
+using static sourc_backend_stc.Services.StudentService;
 
 namespace sourc_backend_stc.Controllers
 {
@@ -23,7 +24,7 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy tất cả các sinh viên
         [HttpGet("get-all")]
-        [Authorize]
+        // [Authorize]
         public async Task<ActionResult<IEnumerable<Student_ReadAllRes>>> GetAllStudent()
         {
             var classes = await _studentService.GetAllStudent();
@@ -34,30 +35,45 @@ namespace sourc_backend_stc.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateStudent([FromBody] Student_CreateReq createReq)
         {
+            // Kiểm tra xem yêu cầu có hợp lệ hay không
             if (createReq == null)
             {
-                // Trả về mã 400 Bad Request nếu đầu vào không hợp lệ
                 return BadRequest("Yêu cầu không hợp lệ.");
             }
 
-            var isCreated = await _studentService.CreateStudent(createReq);
+            // Gọi service để tạo sinh viên
+            var createResult = await _studentService.CreateStudent(createReq);
 
-            if (isCreated)
+            // Dựa trên kết quả trả về từ service, trả về phản hồi phù hợp
+            switch (createResult)
             {
-                // Trả về mã 201 Created nếu thành công
-                return CreatedAtAction(nameof(CreateStudent), new { id = createReq.StudentCode }, "Sinh viên đã được tạo thành công.");
-            }
-            else
-            {
-                // Trả về mã 500 Internal Server Error nếu có lỗi xảy ra
-                return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo sinh viên.");
+                case CreateStudentResult.Success:
+                    return CreatedAtAction(nameof(CreateStudent), new { id = createReq.StudentCode }, "Sinh viên đã được tạo thành công.");
+
+                case CreateStudentResult.DuplicateStudentCode:
+                    return Conflict("Mã sinh viên đã tồn tại trong hệ thống.");
+
+                case CreateStudentResult.DuplicateEmail:
+                    return Conflict("Email đã tồn tại trong hệ thống.");
+                case CreateStudentResult.DuplicateBirthdayDate:
+                    return BadRequest("Ngày sinh không hợp lệ. ");
+
+                case CreateStudentResult.InvalidInput:
+                    return BadRequest("Dữ liệu đầu vào không hợp lệ. ");
+
+                case CreateStudentResult.Error:
+                default:
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo sinh viên. Đã xảy ra lỗi hệ thống.");
             }
         }
 
 
+
+
+
         // // Lấy Student theo ID
         [HttpGet("get-by-id/{studentId}")]
-        [Authorize]
+        // [Authorize]
         public async Task<IActionResult> GetStudentById(int studentId)
         {
             if (studentId <= 0)
@@ -84,25 +100,39 @@ namespace sourc_backend_stc.Controllers
         [Authorize]
         public async Task<IActionResult> UpdateClassUpdateStudent([FromBody] Student_UpdateReq updateReq)
         {
-            if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.StudentCode)
-            || string.IsNullOrWhiteSpace(updateReq.StudentName)
-            || string.IsNullOrWhiteSpace(updateReq.NumberPhone)
-            || string.IsNullOrWhiteSpace(updateReq.Email))
+            // Kiểm tra xem yêu cầu có hợp lệ hay không
+            if (updateReq == null)
             {
-                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
+                return BadRequest("Yêu cầu không hợp lệ.");
             }
 
-            var isUpdated = await _studentService.UpdateStudent(updateReq);
+            // Gọi service để cập nhật sinh viên
+            var updateResult = await _studentService.UpdateStudent(updateReq);
 
-            if (isUpdated)
+            // Dựa trên kết quả trả về từ service, trả về phản hồi phù hợp
+            switch (updateResult)
             {
-                return Ok("Cập nhật sinh viên thành công.");
-            }
-            else
-            {
-                return NotFound("Không tìm thấy sinh viên hoặc cập nhật thất bại.");
+                case UpdateStudentResult.Success:
+                    return Ok("Cập nhật sinh viên thành công.");
+
+                case UpdateStudentResult.StudentNotFound:
+                    return NotFound("Không tìm thấy sinh viên.");
+
+                case UpdateStudentResult.DuplicateStudentCode:
+                    return Conflict("Mã sinh viên đã tồn tại trong hệ thống.");
+
+                case UpdateStudentResult.DuplicateEmail:
+                    return Conflict("Email đã tồn tại trong hệ thống.");
+
+                case UpdateStudentResult.InvalidInput:
+                    return BadRequest("Dữ liệu đầu vào không hợp lệ.");
+
+                case UpdateStudentResult.Error:
+                default:
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Không thể cập nhật sinh viên. Đã xảy ra lỗi hệ thống.");
             }
         }
+
 
 
         [HttpDelete("delete/{studentId}")]
