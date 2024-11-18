@@ -77,15 +77,16 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateExam_Student([FromBody] Exam_Student_UpdateReq updateReq)
+        [HttpPut("update/{examStudentId}")]
+        public async Task<IActionResult> UpdateExam_Student(int examStudentId, [FromBody] Exam_Student_UpdateReq updateReq)
         {
             if (updateReq == null || updateReq.ExamID <= 0 || updateReq.StudentID <= 0)
             {
                 return BadRequest("Dữ liệu cập nhật không hợp lệ. Vui lòng kiểm tra ExamID và StudentID.");
             }
 
-            var isUpdated = await _exam_studentService.UpdateExam_Student(updateReq);
+            // Gọi UpdateExam_Student với examStudentId và updateReq
+            var isUpdated = await _exam_studentService.UpdateExam_Student(examStudentId, updateReq);
 
             if (isUpdated)
             {
@@ -93,10 +94,11 @@ namespace sourc_backend_stc.Controllers
             }
             else
             {
-                Console.WriteLine("Không tìm thấy Exam_Student hoặc cập nhật thất bại cho ID: " + updateReq.StudentID);
+                Console.WriteLine("Không tìm thấy Exam_Student hoặc cập nhật thất bại cho ID: " + examStudentId);
                 return NotFound("Không tìm thấy Exam_Student hoặc cập nhật thất bại.");
             }
         }
+
 
 
 
