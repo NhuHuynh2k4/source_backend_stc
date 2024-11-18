@@ -7,7 +7,7 @@ namespace sourc_backend_stc.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class ClassStudentController : ControllerBase
     {
         private readonly IClassStudentService _classStudentService;

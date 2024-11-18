@@ -9,7 +9,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class SubjectController : ControllerBase
     {
         private readonly ISubjectService _subjectService;
@@ -60,13 +60,13 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Cập nhật môn học
-        [HttpPut("update/{subjectId}")]
-        public async Task<IActionResult> UpdateSubject(int subjectId, [FromBody] Subject_UpdateReq request)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateSubject([FromBody] Subject_UpdateReq request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.SubjectsCode) || string.IsNullOrWhiteSpace(request.SubjectsName))
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
 
-            var isUpdated = await _subjectService.UpdateSubjectAsync(subjectId, request);
+            var isUpdated = await _subjectService.UpdateSubjectAsync(request);
 
             return isUpdated ? Ok("Cập nhật môn học thành công.") : NotFound("Không tìm thấy môn học hoặc cập nhật thất bại.");
         }

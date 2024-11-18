@@ -91,15 +91,6 @@ namespace sourc_backend_stc.Services
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
 
-            // var newAnswer = new Answer_CreateReq
-            // {
-            //     AnswerName = answerDto.AnswerName,
-            //     AnswerTextContent = answerDto.AnswerTextContent,
-            //     AnswerImgContent = answerDto.AnswerImgContent,
-            //     IsTrue = answerDto.IsTrue,
-            //     QuestionID = answerDto.QuestionID
-            // };
-
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
                 await connection.OpenAsync();
