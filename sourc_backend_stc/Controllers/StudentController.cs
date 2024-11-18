@@ -97,7 +97,7 @@ namespace sourc_backend_stc.Controllers
         }
 
         [HttpPut("update")]
-        [Authorize]
+        // [Authorize]
         public async Task<IActionResult> UpdateClassUpdateStudent([FromBody] Student_UpdateReq updateReq)
         {
             // Kiểm tra xem yêu cầu có hợp lệ hay không
