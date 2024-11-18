@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using sourc_backend_stc.Models;
 using sourc_backend_stc.Services;
@@ -8,6 +9,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Authorize]
     public class SubjectController : ControllerBase
     {
         private readonly ISubjectService _subjectService;
@@ -29,13 +31,8 @@ namespace sourc_backend_stc.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> CreateSubject([FromBody] Subject_CreateReq request)
         {
-            // Validate request
-            if (request == null ||
-                string.IsNullOrWhiteSpace(request.SubjectsCode) || request.SubjectsCode == "string" ||
-                string.IsNullOrWhiteSpace(request.SubjectsName) || request.SubjectsName == "string")
-            {
-                return BadRequest("Yêu cầu không hợp lệ");
-            }
+            if (request == null)
+                return BadRequest("Yêu cầu không hợp lệ.");
 
             try
             {
@@ -50,6 +47,7 @@ namespace sourc_backend_stc.Controllers
             }
         }
 
+
         // Lấy môn học theo ID
         [HttpGet("get-by-id/{subjectId}")]
         public async Task<IActionResult> GetSubjectById(int subjectId)
@@ -62,18 +60,14 @@ namespace sourc_backend_stc.Controllers
         }
 
         // Cập nhật môn học
-        [HttpPut("update/{subjectId}")]
-        public async Task<IActionResult> UpdateSubject(int subjectId, [FromBody] Subject_UpdateReq request)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateSubject([FromBody] Subject_UpdateReq request)
         {
-            // Validate request
-            if (request == null ||
-                string.IsNullOrWhiteSpace(request.SubjectsCode) || request.SubjectsCode == "string" ||
-                string.IsNullOrWhiteSpace(request.SubjectsName) || request.SubjectsName == "string")
-            {
+            if (request == null || string.IsNullOrWhiteSpace(request.SubjectsCode) || string.IsNullOrWhiteSpace(request.SubjectsName))
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
-            }
 
-            var isUpdated = await _subjectService.UpdateSubjectAsync(subjectId, request);
+            var isUpdated = await _subjectService.UpdateSubjectAsync(request);
+
             return isUpdated ? Ok("Cập nhật môn học thành công.") : NotFound("Không tìm thấy môn học hoặc cập nhật thất bại.");
         }
 

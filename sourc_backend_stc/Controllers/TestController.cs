@@ -11,7 +11,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class TestController : ControllerBase
     {
         private readonly ITestService _testService;

@@ -9,7 +9,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class ExamController : ControllerBase
     {
         private readonly IExamService _examService;
@@ -33,18 +33,18 @@ namespace sourc_backend_stc.Controllers
         {
             if (examDto == null)
             {
-                return BadRequest("Yêu cầu không hợp lệ.");
+                return BadRequest(new {message = "Yêu cầu không hợp lệ."});
             }
 
             var isCreated = await _examService.CreateExam(examDto);
 
             if (isCreated)
             {
-                return CreatedAtAction(nameof(CreateExam), new { id = examDto.ExamCode }, "Kỳ thi đã được tạo thành công.");
+                return CreatedAtAction(nameof(CreateExam), new { id = examDto.ExamCode }, new {message = "Kỳ thi đã được tạo thành công."});
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo kỳ thi.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new {message = "Không thể tạo kỳ thi."});
             }
         }
 
@@ -54,7 +54,7 @@ namespace sourc_backend_stc.Controllers
         {
             if (examId <= 0)
             {
-                return BadRequest("ID kỳ thi không hợp lệ.");
+                return BadRequest(new {message ="ID kỳ thi không hợp lệ."});
             }
 
             var examInfo = await _examService.GetExamById(examId);
@@ -65,7 +65,7 @@ namespace sourc_backend_stc.Controllers
             }
             else
             {
-                return NotFound("Không tìm thấy kỳ thi với ID đã cho.");
+                return NotFound(new {message ="Không tìm thấy kỳ thi với ID đã cho."});
             }
         }
 
@@ -75,18 +75,18 @@ namespace sourc_backend_stc.Controllers
         {
             if (updateReq == null)
             {
-                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
+                return BadRequest(new {message ="Dữ liệu cập nhật không hợp lệ."});
             }
 
             var isUpdated = await _examService.UpdateExam(updateReq);
 
             if (isUpdated)
             {
-                return Ok("Cập nhật kỳ thi thành công.");
+                return Ok(new {message ="Cập nhật kỳ thi thành công."});
             }
             else
             {
-                return NotFound("Không tìm thấy kỳ thi hoặc cập nhật thất bại.");
+                return NotFound(new {message ="Không tìm thấy kỳ thi hoặc cập nhật thất bại."});
             }
         }
 
@@ -96,18 +96,18 @@ namespace sourc_backend_stc.Controllers
         {
             if (examId <= 0)
             {
-                return BadRequest("ID kỳ thi không hợp lệ.");
+                return BadRequest(new {message ="ID kỳ thi không hợp lệ."});
             }
 
             var isDeleted = await _examService.DeleteExam(examId);
 
             if (isDeleted)
             {
-                return Ok("Đã xóa mềm kỳ thi thành công.");
+                return Ok(new {message ="Đã xóa mềm kỳ thi thành công."});
             }
             else
             {
-                return NotFound("Không tìm thấy kỳ thi với ID đã cho.");
+                return NotFound(new {message ="Không tìm thấy kỳ thi với ID đã cho."});
             }
         }
     }

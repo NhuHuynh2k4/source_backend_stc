@@ -2,8 +2,8 @@ namespace sourc_backend_stc.Models
 {
     public class Exam_CreateReq
     {
-        public string ExamCode { get; set; }
-        public string ExamName { get; set; }
+        public string? ExamCode { get; set; }
+        public string? ExamName { get; set; }
         public DateTime ExamDate { get; set; }
         public int Duration { get; set; }
         public int NumberOfQuestions { get; set; }

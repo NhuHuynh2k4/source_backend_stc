@@ -2,9 +2,6 @@ namespace sourc_backend_stc.Models
 {
     public class TestQuestion_CreateReq
     {
-        // public int Test_QuestionID { get; set;}
-        // public DateTime CreateDate {get; set;}
-        // public DateTime UpdateDate {get; set;}
         public int QuestionID { get; set; }
         public int TestID { get; set; }
     }
