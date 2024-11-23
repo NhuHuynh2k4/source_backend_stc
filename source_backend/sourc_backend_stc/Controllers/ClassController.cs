@@ -1,136 +1,163 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using System.Data;
-using sourc_backend_stc.Data;
 using sourc_backend_stc.Models;
 using Dapper;
+using sourc_backend_stc.Services;
+using sourc_backend_stc.Utils;
+using Microsoft.AspNetCore.Authorization;
 
 namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ClassController : ControllerBase
     {
-        private readonly IConfiguration _configuration;
+        private readonly IClassService _classService;
 
-        public ClassController(IConfiguration configuration)
+        public ClassController(IClassService classService)
         {
-            _configuration = configuration;
+            _classService = classService;
         }
 
-        // Lấy tất cả dữ liệu Class
+        // Lấy tất cả các lớp học
         [HttpGet("get-all")]
-        public IActionResult GetAllClass()
+        public async Task<ActionResult<IEnumerable<Class_ReadAllRes>>> GetAllClasses()
         {
-            try
-            {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    connection.Open();
-                    var query = "EXEC GetAllClass;";
-                    var classes = connection.Query<Class>(query).ToList();
-                    return Ok(classes);
-                }
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
+            var classes = await _classService.GetAllClasses();
+            return Ok(classes); // Trả về danh sách lớp học với mã 200 OK
         }
 
         // Tạo mới Class
         [HttpPost("create")]
-        public IActionResult CreateClass([FromBody] Class newClass)
+        public async Task<IActionResult> CreateClass([FromBody] Class_CreateReq classDto)
         {
-            try
+            if (classDto == null)
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    connection.Open();
-                    var query = "EXEC CreateClass @ClassCode, @ClassName, @Session, @SubjectsID";
-                    var parameters = new
-                    {
-                        ClassCode = newClass.ClassCode,
-                        ClassName = newClass.ClassName,
-                        Session = newClass.Session,
-                        SubjectsID = newClass.SubjectsID
-                    };
-                    connection.Execute(query, parameters);
-                    return Ok("Class created successfully.");
-                }
+                // Trả về mã 400 Bad Request nếu đầu vào không hợp lệ
+                return BadRequest("Yêu cầu không hợp lệ.");
             }
-            catch (Exception ex)
+
+            var isCreated = await _classService.CreateClass(classDto);
+
+            if (isCreated)
             {
-                return StatusCode(500, ex.Message);
+                // Trả về mã 201 Created nếu thành công
+                return CreatedAtAction(nameof(CreateClass), new { id = classDto.ClassCode }, "Lớp học đã được tạo thành công.");
+            }
+            else
+            {
+                // Trả về mã 500 Internal Server Error nếu có lỗi xảy ra
+                return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo lớp học.");
             }
         }
 
-        // Lấy Class theo ID
-        [HttpGet("get-by-id/{id}")]
-        public IActionResult GetClassByID(int id)
+
+        [HttpGet("get-by-id/{classId}")]
+        public async Task<IActionResult> GetClassById(int classId)
         {
-            try
+            if (classId <= 0)
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    connection.Open();
-                    var query = "EXEC GetClassByID @ClassID";
-                    var classData = connection.QuerySingleOrDefault<Class>(query, new { ClassID = id });
-                    if (classData == null) return NotFound("Class not found.");
-                    return Ok(classData);
-                }
+                // Trả về mã lỗi 400 nếu classId không hợp lệ
+                return BadRequest("ID lớp học không hợp lệ.");
             }
-            catch (Exception ex)
+
+            var classInfo = await _classService.GetClassById(classId);
+
+            if (classInfo != null)
             {
-                return StatusCode(500, ex.Message);
+                // Trả về mã 200 OK và thông tin lớp học nếu tìm thấy
+                return Ok(classInfo);
+            }
+            else
+            {
+                // Trả về mã lỗi 404 nếu không tìm thấy lớp học
+                return NotFound("Không tìm thấy lớp học với ID đã cho.");
             }
         }
 
-        // Cập nhật Class
-        [HttpPut("update/{id}")]
-        public IActionResult UpdateClass(int id, [FromBody] Class updatedClass)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateClass([FromBody] Class_UpdateReq updateReq)
         {
-            try
+            if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.ClassCode) || string.IsNullOrWhiteSpace(updateReq.ClassName))
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    connection.Open();
-                    var query = "EXEC UpdateClass @ClassID, @ClassCode, @ClassName, @Session, @SubjectsID";
-                    var parameters = new
-                    {
-                        ClassID = id,
-                        ClassCode = updatedClass.ClassCode,
-                        ClassName = updatedClass.ClassName,
-                        Session = updatedClass.Session,
-                        SubjectsID = updatedClass.SubjectsID
-                    };
-                    connection.Execute(query, parameters);
-                    return Ok("Class updated successfully.");
-                }
+                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
-            catch (Exception ex)
+
+            var isUpdated = await _classService.UpdateClass(updateReq);
+
+            if (isUpdated)
             {
-                return StatusCode(500, ex.Message);
+                return Ok("Cập nhật lớp học thành công.");
+            }
+            else
+            {
+                return NotFound("Không tìm thấy lớp học hoặc cập nhật thất bại.");
             }
         }
 
-        // Xóa mềm Class
-        [HttpDelete("delete/{id}")]
-        public IActionResult DeleteClass(int id)
+
+        [HttpDelete("delete/{classId}")]
+        public async Task<IActionResult> SoftDeleteClass(int classId)
+        {
+            if (classId <= 0)
+            {
+                return BadRequest("ID lớp học không hợp lệ.");
+            }
+
+            var isDeleted = await _classService.DeleteClass(classId);
+
+            if (isDeleted)
+            {
+                return Ok("Đã xóa mềm lớp học thành công.");
+            }
+            else
+            {
+                return NotFound("Không tìm thấy lớp học với ID đã cho.");
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchClasses([FromQuery] string classCode, [FromQuery] string className, [FromQuery] string session, [FromQuery] string subjectName)
         {
             try
             {
-                using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
-                {
-                    connection.Open();
-                    var query = "EXEC DeleteClass @ClassID";
-                    connection.Execute(query, new { ClassID = id });
-                    return Ok("Class deleted successfully (soft delete).");
-                }
+                // Gọi dịch vụ tìm kiếm
+                var classes = await _classService.SearchClasses(classCode, className, session, subjectName);
+
+                // Trả về kết quả tìm kiếm
+                return Ok(classes);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                // Xử lý lỗi
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
+        }
+
+        // Endpoint để xuất lớp học ra file Excel
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportClassesToExcel()
+        {
+            try
+            {
+                // Lấy danh sách các lớp học từ dịch vụ của bạn
+                var classes = await _classService.GetAllClasses();
+
+                // Chuyển đổi từ IEnumerable sang List
+                var classesList = classes.ToList(); // Sử dụng ToList() để chuyển đổi
+
+                // Sử dụng service ExcelExportService để xuất dữ liệu ra file Excel
+                var excelFile = _classService.ExportClassesToExcel(classesList);
+
+                // Trả về file Excel cho client
+                return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Classes.xlsx");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return StatusCode(StatusCodes.Status500InternalServerError, "Có lỗi xảy ra khi xuất Excel.");
             }
         }
     }
