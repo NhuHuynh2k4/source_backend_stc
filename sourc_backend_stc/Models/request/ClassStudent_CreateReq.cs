@@ -4,5 +4,7 @@ namespace sourc_backend_stc.Models
     {
         public int ClassID { get; set; }
         public int StudentID { get; set; }
+
+        
     }
 }
