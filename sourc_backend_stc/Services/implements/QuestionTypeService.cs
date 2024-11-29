@@ -80,7 +80,11 @@ namespace sourc_backend_stc.Services
                 {
                     var result = await connection.ExecuteAsync(
                         "CreateQuestionType",
-                        request,
+                        new
+                        {
+                            QuestionTypeCode = request.QuestionTypeCode,
+                            QuestionTypeName = request.QuestionTypeName
+                        },
                         commandType: CommandType.StoredProcedure
                     );
                     return result > 0;
@@ -103,7 +107,12 @@ namespace sourc_backend_stc.Services
                 {
                     var result = await connection.ExecuteAsync(
                         "UpdateQuestionType",
-                        request,
+                        new
+                        {
+                            QuestionTypeID = request.QuestionTypeID,
+                            QuestionTypeCode = request.QuestionTypeCode,
+                            QuestionTypeName = request.QuestionTypeName
+                        },
                         commandType: CommandType.StoredProcedure
                     );
                     return result > 0;

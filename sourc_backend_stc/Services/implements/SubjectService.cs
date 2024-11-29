@@ -35,16 +35,37 @@ namespace sourc_backend_stc.Services
         {
             using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
             {
+                const string query = @"
+            EXEC CreateSubject 
+                @SubjectsCode, @SubjectsName";
 
-                return await connection.ExecuteAsync("CreateSubject", request, commandType: CommandType.StoredProcedure);
+                var parameters = new
+                {
+                    request.SubjectsCode,
+                    request.SubjectsName
+                };
+
+                return await connection.ExecuteScalarAsync<int>(query, parameters);
             }
         }
 
-        public async Task<bool> UpdateSubjectAsync(Subject_UpdateReq request)
+        public async Task<bool> UpdateSubjectAsync(int subjectId, Subject_UpdateReq request)
         {
             using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-        
-            var result = await connection.ExecuteAsync("UpdateSubject", request, commandType: CommandType.StoredProcedure);
+            const string query = @"
+        EXEC UpdateSubject 
+            @SubjectsID = @SubjectsID, 
+            @SubjectsCode = @SubjectsCode, 
+            @SubjectsName = @SubjectsName";
+
+            var parameters = new
+            {
+                SubjectsID = subjectId,
+                request.SubjectsCode,
+                request.SubjectsName
+            };
+
+            var result = await connection.ExecuteAsync(query, parameters);
             return result > 0;
         }
 
@@ -52,10 +73,16 @@ namespace sourc_backend_stc.Services
         public async Task<bool> DeleteSubjectAsync(int subjectId)
         {
             using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            const string query = @"
+        EXEC DeleteSubject 
+            @SubjectsID = @SubjectsID";
 
-            var parameters = new{ SubjectsID = subjectId };
+            var parameters = new
+            {
+                SubjectsID = subjectId
+            };
 
-            var result = await connection.ExecuteAsync("DeleteSubject", parameters, commandType: CommandType.StoredProcedure);
+            var result = await connection.ExecuteAsync(query, parameters);
             return result > 0;
         }
 

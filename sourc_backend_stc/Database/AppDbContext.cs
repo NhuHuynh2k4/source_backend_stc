@@ -18,12 +18,12 @@ namespace sourc_backend_stc.Data
             modelBuilder.Entity<ClassStudent>()
                 .Property(cs => cs.Class_StudentID)
                 .HasColumnName("Class_StudentID");
-            
+
             modelBuilder.Entity<QuestionType>()
                 .ToTable("QuestionType"); // Cấu hình tên bảng tại đây
         }
         public DbSet<QuestionType> QuestionType { get; set; }
 
-        public DbSet<Student> Student{ get; set; }
+        public DbSet<Student> Student { get; set; }
     }
 }

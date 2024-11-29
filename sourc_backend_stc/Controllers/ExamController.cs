@@ -9,7 +9,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ExamController : ControllerBase
     {
         private readonly IExamService _examService;
@@ -33,18 +33,18 @@ namespace sourc_backend_stc.Controllers
         {
             if (examDto == null)
             {
-                return BadRequest(new {message = "Yêu cầu không hợp lệ."});
+                return BadRequest("Yêu cầu không hợp lệ.");
             }
 
             var isCreated = await _examService.CreateExam(examDto);
 
             if (isCreated)
             {
-                return CreatedAtAction(nameof(CreateExam), new { id = examDto.ExamCode }, new {message = "Kỳ thi đã được tạo thành công."});
+                return CreatedAtAction(nameof(CreateExam), new { id = examDto.ExamCode }, "Kỳ thi đã được tạo thành công.");
             }
             else
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new {message = "Không thể tạo kỳ thi."});
+                return StatusCode(StatusCodes.Status500InternalServerError, "Không thể tạo kỳ thi.");
             }
         }
 
@@ -54,7 +54,7 @@ namespace sourc_backend_stc.Controllers
         {
             if (examId <= 0)
             {
-                return BadRequest(new {message ="ID kỳ thi không hợp lệ."});
+                return BadRequest("ID kỳ thi không hợp lệ.");
             }
 
             var examInfo = await _examService.GetExamById(examId);
@@ -65,7 +65,7 @@ namespace sourc_backend_stc.Controllers
             }
             else
             {
-                return NotFound(new {message ="Không tìm thấy kỳ thi với ID đã cho."});
+                return NotFound("Không tìm thấy kỳ thi với ID đã cho.");
             }
         }
 
@@ -75,18 +75,18 @@ namespace sourc_backend_stc.Controllers
         {
             if (updateReq == null)
             {
-                return BadRequest(new {message ="Dữ liệu cập nhật không hợp lệ."});
+                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
             var isUpdated = await _examService.UpdateExam(updateReq);
 
             if (isUpdated)
             {
-                return Ok(new {message ="Cập nhật kỳ thi thành công."});
+                return Ok("Cập nhật kỳ thi thành công.");
             }
             else
             {
-                return NotFound(new {message ="Không tìm thấy kỳ thi hoặc cập nhật thất bại."});
+                return NotFound("Không tìm thấy kỳ thi hoặc cập nhật thất bại.");
             }
         }
 
@@ -96,18 +96,43 @@ namespace sourc_backend_stc.Controllers
         {
             if (examId <= 0)
             {
-                return BadRequest(new {message ="ID kỳ thi không hợp lệ."});
+                return BadRequest("ID kỳ thi không hợp lệ.");
             }
 
             var isDeleted = await _examService.DeleteExam(examId);
 
             if (isDeleted)
             {
-                return Ok(new {message ="Đã xóa mềm kỳ thi thành công."});
+                return Ok("Đã xóa mềm kỳ thi thành công.");
             }
             else
             {
-                return NotFound(new {message ="Không tìm thấy kỳ thi với ID đã cho."});
+                return NotFound("Không tìm thấy kỳ thi với ID đã cho.");
+            }
+        }
+
+        // Endpoint để xuất lớp học ra file Excel
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportExamsToExcel()
+        {
+            try
+            {
+                // Lấy danh sách các lớp học từ dịch vụ của bạn
+                var exams = await _examService.GetAllExams();
+
+                // Chuyển đổi từ IEnumerable sang List
+                var examsList = exams.ToList(); // Sử dụng ToList() để chuyển đổi
+
+                // Sử dụng service ExcelExportService để xuất dữ liệu ra file Excel
+                var excelFile = _examService.ExportExamsToExcel(examsList);
+
+                // Trả về file Excel cho client
+                return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Exams.xlsx");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return StatusCode(StatusCodes.Status500InternalServerError, "Có lỗi xảy ra khi xuất Excel.");
             }
         }
     }

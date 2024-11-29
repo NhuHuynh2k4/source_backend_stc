@@ -9,7 +9,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class MarkController : ControllerBase
     {
         private readonly IMarkService _markService;
