@@ -45,7 +45,6 @@ namespace sourc_backend_stc.Services
                         Duration = Exam_StudentInfo.Duration,
                         NumberOfQuestions = Exam_StudentInfo.NumberOfQuestions,
                         TotalMarks = Exam_StudentInfo.TotalMarks,
-                        TestID = Exam_StudentInfo.TestID,
                         StudentID = Exam_StudentInfo.StudentID,
                         StudentCode = Exam_StudentInfo.StudentCode,
                         StudentName = Exam_StudentInfo.StudentName,
