@@ -1,28 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "D:\\FPOLY\\THUCTAP\\da\\source_backend_stc-vinh_tts\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
+    "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
   },
   "projects": {
-    "D:\\FPOLY\\THUCTAP\\da\\source_backend_stc-vinh_tts\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj": {
+    "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\FPOLY\\THUCTAP\\da\\source_backend_stc-vinh_tts\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "projectUniqueName": "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
         "projectName": "sourc_backend_stc",
-        "projectPath": "D:\\FPOLY\\THUCTAP\\da\\source_backend_stc-vinh_tts\\source_backend\\sourc_backend_stc\\sourc_backend_stc.csproj",
-        "packagesPath": "C:\\Users\\Admin\\.nuget\\packages\\",
-        "outputPath": "D:\\FPOLY\\THUCTAP\\da\\source_backend_stc-vinh_tts\\source_backend\\sourc_backend_stc\\obj\\",
+        "projectPath": "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net7.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "C:\\Program Files\\dotnet\\library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -35,11 +32,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -50,6 +42,10 @@
               "target": "Package",
               "version": "[2.1.35, )"
             },
+            "EPPlus": {
+              "target": "Package",
+              "version": "[7.5.1, )"
+            },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[7.0.20, )"
@@ -57,10 +53,6 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[7.0.20, )"
-            },
-            "Microsoft.Data.SqlClient": {
-              "target": "Package",
-              "version": "[5.2.2, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -75,6 +67,10 @@
             "Microsoft.EntityFrameworkCore.SqlServer": {
               "target": "Package",
               "version": "[7.0.20, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.3, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -100,7 +96,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.403\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.410\\RuntimeIdentifierGraph.json"
         }
       }
     }

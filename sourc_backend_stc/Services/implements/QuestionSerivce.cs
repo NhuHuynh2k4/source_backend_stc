@@ -12,45 +12,86 @@ namespace sourc_backend_stc.Services
     public class QuestionService : IQuestionService
     {
         private readonly IConfiguration _configuration;
+        private readonly string _connectionString;
 
         public QuestionService(IConfiguration configuration)
         {
             _configuration = configuration;
+            _connectionString = _configuration.GetConnectionString("DefaultConnection");
         }
 
         public async Task<IEnumerable<QuestionReadAllRes>> GetAllQuestions()
         {
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_connectionString))
             {
-                return await connection.QueryAsync<QuestionReadAllRes>("GetAllQuestion", commandType: CommandType.StoredProcedure);
+                const string query = "EXEC GetAllQuestion";
+                return (await connection.QueryAsync<QuestionReadAllRes>(query)).ToList();
             }
         }
 
         public async Task<QuestionReadAllRes> GetQuestionById(int questionId)
         {
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_connectionString))
             {
-                return await connection.QueryFirstOrDefaultAsync<QuestionReadAllRes>(
-                "GetQuestionById", 
-                new { QuestionID = questionId },
-                commandType: CommandType.StoredProcedure);
+                const string query = "EXEC GetQuestionById @QuestionID";
+                return await connection.QueryFirstOrDefaultAsync<QuestionReadAllRes>(query, new { QuestionID = questionId });
             }
         }
 
         public async Task<int> CreateQuestion(Question_CreateReq request)
         {
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_connectionString))
             {
-                return await connection.ExecuteAsync("CreateQuestion", request, commandType: CommandType.StoredProcedure);
+                const string query = @"
+            EXEC CreateQuestion 
+                @QuestionCode = @QuestionCode, 
+                @QuestionName = @QuestionName, 
+                @QuestionTextContent = @QuestionTextContent, 
+                @QuestionImgContent = @QuestionImgContent, 
+                @SubjectsID = @SubjectsID, 
+                @QuestionTypeID = @QuestionTypeID";
+
+                var parameters = new
+                {
+                    request.QuestionCode,
+                    request.QuestionName,
+                    request.QuestionTextContent,
+                    request.QuestionImgContent,
+                    request.SubjectsID,
+                    request.QuestionTypeID
+                };
+
+                return await connection.ExecuteScalarAsync<int>(query, parameters);
             }
         }
 
 
-        public async Task<bool> UpdateQuestion(Question_UpdateReq request)
+        public async Task<bool> UpdateQuestion(int questionId, Question_UpdateReq request)
         {
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_connectionString))
             {
-                var rowsAffected = await connection.ExecuteAsync("UpdateQuestion", request, commandType: CommandType.StoredProcedure);
+                const string query = @"
+            EXEC UpdateQuestion 
+                @QuestionID = @QuestionID, 
+                @QuestionCode = @QuestionCode, 
+                @QuestionName = @QuestionName, 
+                @QuestionTextContent = @QuestionTextContent, 
+                @QuestionImgContent = @QuestionImgContent, 
+                @SubjectsID = @SubjectsID, 
+                @QuestionTypeID = @QuestionTypeID";
+
+                var parameters = new
+                {
+                    QuestionID = questionId,
+                    request.QuestionCode,
+                    request.QuestionName,
+                    request.QuestionTextContent,
+                    request.QuestionImgContent,
+                    request.SubjectsID,
+                    request.QuestionTypeID
+                };
+
+                var rowsAffected = await connection.ExecuteAsync(query, parameters);
                 return rowsAffected > 0;
             }
         }
@@ -58,11 +99,12 @@ namespace sourc_backend_stc.Services
 
         public async Task<bool> DeleteQuestion(int questionId)
         {
-            using (var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection")))
+            using (var connection = new SqlConnection(_connectionString))
             {
+                const string query = "EXEC DeleteQuestion @QuestionID = @QuestionID";
                 var parameters = new { QuestionID = questionId };
 
-                var rowsAffected = await connection.ExecuteAsync("DeleteQuestion", parameters, commandType: CommandType.StoredProcedure);
+                var rowsAffected = await connection.ExecuteAsync(query, parameters);
                 return rowsAffected > 0;
             }
         }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Data;
 using sourc_backend_stc.Utils;
+using OfficeOpenXml;
 
 namespace sourc_backend_stc.Services
 {
@@ -137,7 +138,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result==1; // Trả về true nếu cập nhật thành công
+                    return result == 1; // Trả về true nếu cập nhật thành công
                 }
                 catch (Exception ex)
                 {
@@ -174,6 +175,80 @@ namespace sourc_backend_stc.Services
                     // Log lỗi nếu cần
                     return false; // Trả về false nếu có lỗi xảy ra
                 }
+            }
+        }
+
+        public async Task<IEnumerable<Class_ReadAllRes>> SearchClasses(string classCode = null, string className = null, string session = null, string subjectName = null)
+        {
+            using (var connection = DatabaseConnection.GetConnection(_configuration))
+            {
+                await connection.OpenAsync();
+
+                try
+                {
+                    // Tạo câu truy vấn SQL động tùy thuộc vào các tham số tìm kiếm
+                    var query = "SELECT * FROM Classes WHERE 1=1";  // Lọc tất cả các lớp, 1=1 là điều kiện luôn đúng
+
+                    // Các tham số tìm kiếm
+                    if (!string.IsNullOrEmpty(classCode))
+                    {
+                        query += " AND ClassCode LIKE @ClassCode";
+                    }
+                    if (!string.IsNullOrEmpty(className))
+                    {
+                        query += " AND ClassName LIKE @ClassName";
+                    }
+                    if (!string.IsNullOrEmpty(session))
+                    {
+                        query += " AND Session LIKE @Session";
+                    }
+                    if (!string.IsNullOrEmpty(subjectName))
+                    {
+                        query += " AND SubjectsName LIKE @SubjectsName";
+                    }
+
+                    // Thực thi câu truy vấn
+                    var result = await connection.QueryAsync<Class_ReadAllRes>(
+                        query,
+                        new { ClassCode = $"%{classCode}%", ClassName = $"%{className}%", Session = $"%{session}%", SubjectsName = $"%{subjectName}%" }
+                    );
+
+                    return result; // Trả về kết quả tìm kiếm
+                }
+                catch (Exception ex)
+                {
+                    // Log lỗi nếu có
+                    return Enumerable.Empty<Class_ReadAllRes>(); // Trả về danh sách trống nếu có lỗi
+                }
+            }
+        }
+
+        public byte[] ExportClassesToExcel(List<Class_ReadAllRes> classes)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Classes");
+
+                // Đặt tiêu đề cho các cột
+                worksheet.Cells[1, 1].Value = "STT";
+                worksheet.Cells[1, 2].Value = "Mã lớp";
+                worksheet.Cells[1, 3].Value = "Tên lớp";
+                worksheet.Cells[1, 4].Value = "Buổi học";
+                worksheet.Cells[1, 5].Value = "Chủ đề";
+
+                // Dữ liệu lớp học
+                for (int i = 0; i < classes.Count; i++)
+                {
+                    var currentClass = classes[i];
+                    worksheet.Cells[i + 2, 1].Value = i + 1;
+                    worksheet.Cells[i + 2, 2].Value = currentClass.ClassCode;
+                    worksheet.Cells[i + 2, 3].Value = currentClass.ClassName;
+                    worksheet.Cells[i + 2, 4].Value = currentClass.Session;
+                    worksheet.Cells[i + 2, 5].Value = currentClass.SubjectsName;
+                }
+
+                // Trả về byte array của file Excel
+                return package.GetAsByteArray();
             }
         }
     }

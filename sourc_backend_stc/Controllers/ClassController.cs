@@ -11,7 +11,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class ClassController : ControllerBase
     {
         private readonly IClassService _classService;
@@ -36,7 +36,7 @@ namespace sourc_backend_stc.Controllers
             if (classDto == null)
             {
                 // Trả về mã 400 Bad Request nếu đầu vào không hợp lệ
-                return BadRequest(new {messgase="Yêu cầu không hợp lệ."});
+                return BadRequest("Yêu cầu không hợp lệ.");
             }
 
             var isCreated = await _classService.CreateClass(classDto);
@@ -44,7 +44,7 @@ namespace sourc_backend_stc.Controllers
             if (isCreated)
             {
                 // Trả về mã 201 Created nếu thành công
-                return CreatedAtAction(nameof(CreateClass), new { id = classDto.ClassCode }, new {messgase="Lớp học đã được tạo thành công."});
+                return CreatedAtAction(nameof(CreateClass), new { id = classDto.ClassCode }, "Lớp học đã được tạo thành công.");
             }
             else
             {
@@ -60,7 +60,7 @@ namespace sourc_backend_stc.Controllers
             if (classId <= 0)
             {
                 // Trả về mã lỗi 400 nếu classId không hợp lệ
-                return BadRequest(new {messgase="ID lớp học không hợp lệ."});
+                return BadRequest("ID lớp học không hợp lệ.");
             }
 
             var classInfo = await _classService.GetClassById(classId);
@@ -73,7 +73,7 @@ namespace sourc_backend_stc.Controllers
             else
             {
                 // Trả về mã lỗi 404 nếu không tìm thấy lớp học
-                return NotFound(new {messgase="Không tìm thấy lớp học với ID đã cho."});
+                return NotFound("Không tìm thấy lớp học với ID đã cho.");
             }
         }
 
@@ -82,18 +82,18 @@ namespace sourc_backend_stc.Controllers
         {
             if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.ClassCode) || string.IsNullOrWhiteSpace(updateReq.ClassName))
             {
-                return BadRequest(new {messgase="Dữ liệu cập nhật không hợp lệ."});
+                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
             var isUpdated = await _classService.UpdateClass(updateReq);
 
             if (isUpdated)
             {
-                return Ok(new {messgase="Cập nhật lớp học thành công."});
+                return Ok("Cập nhật lớp học thành công.");
             }
             else
             {
-                return NotFound(new {messgase="Không tìm thấy lớp học hoặc cập nhật thất bại."});
+                return NotFound("Không tìm thấy lớp học hoặc cập nhật thất bại.");
             }
         }
 
@@ -103,21 +103,63 @@ namespace sourc_backend_stc.Controllers
         {
             if (classId <= 0)
             {
-                return BadRequest(new {messgase= "ID lớp học không hợp lệ."});
+                return BadRequest("ID lớp học không hợp lệ.");
             }
 
             var isDeleted = await _classService.DeleteClass(classId);
 
             if (isDeleted)
             {
-                return Ok(new {messgase="Đã xóa mềm lớp học thành công."});
+                return Ok("Đã xóa mềm lớp học thành công.");
             }
             else
             {
-                return NotFound(new {messgase="Không tìm thấy lớp học với ID đã cho."});
+                return NotFound("Không tìm thấy lớp học với ID đã cho.");
             }
         }
 
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchClasses([FromQuery] string classCode, [FromQuery] string className, [FromQuery] string session, [FromQuery] string subjectName)
+        {
+            try
+            {
+                // Gọi dịch vụ tìm kiếm
+                var classes = await _classService.SearchClasses(classCode, className, session, subjectName);
+
+                // Trả về kết quả tìm kiếm
+                return Ok(classes);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
+        }
+
+        // Endpoint để xuất lớp học ra file Excel
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportClassesToExcel()
+        {
+            try
+            {
+                // Lấy danh sách các lớp học từ dịch vụ của bạn
+                var classes = await _classService.GetAllClasses();
+
+                // Chuyển đổi từ IEnumerable sang List
+                var classesList = classes.ToList(); // Sử dụng ToList() để chuyển đổi
+
+                // Sử dụng service ExcelExportService để xuất dữ liệu ra file Excel
+                var excelFile = _classService.ExportClassesToExcel(classesList);
+
+                // Trả về file Excel cho client
+                return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Classes.xlsx");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return StatusCode(StatusCodes.Status500InternalServerError, "Có lỗi xảy ra khi xuất Excel.");
+            }
+        }
     }
 
 }

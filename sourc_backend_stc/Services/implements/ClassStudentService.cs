@@ -115,7 +115,13 @@ namespace sourc_backend_stc.Services
 
                     // Thực hiện cập nhật thông qua stored procedure
                     var result = await connection.ExecuteAsync(
-                        "UpdateClassStudent",updateReq,
+                        "UpdateClassStudent",
+                        new
+                        {
+                            Class_StudentID = id, // Truyền tham số Class_StudentID
+                            ClassID = updateReq.ClassID, // Truyền tham số ClassID
+                            StudentID = updateReq.StudentID
+                        },
                         commandType: CommandType.StoredProcedure
                     );
 

@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Data;
 using sourc_backend_stc.Utils;
+using OfficeOpenXml;
 
 namespace sourc_backend_stc.Services
 {
     public class ExamService : IExamService
     {
         private readonly IConfiguration _configuration;
+        private readonly TestService _testService;
 
         public ExamService(IConfiguration configuration)
         {
@@ -107,7 +109,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     var result = await connection.ExecuteAsync(
-                        "UpdateExam",updateReq,
+                        "UpdateExam", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 
@@ -140,7 +142,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result==1; // Trả về true nếu cập nhật thành công
+                    return result == 1; // Trả về true nếu cập nhật thành công
                 }
                 catch
                 {
@@ -148,5 +150,43 @@ namespace sourc_backend_stc.Services
                 }
             }
         }
+
+        public byte[] ExportExamsToExcel(List<Exam_ReadAllRes> exams)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Exams");
+
+                // Đặt tiêu đề cho các cột
+                worksheet.Cells[1, 1].Value = "STT";
+                worksheet.Cells[1, 2].Value = "Mã kỳ thi";
+                worksheet.Cells[1, 3].Value = "Tên kỳ thi";
+                worksheet.Cells[1, 4].Value = "Ngày thi";
+                worksheet.Cells[1, 5].Value = "Thời gian thi";
+                worksheet.Cells[1, 6].Value = "Tổng điểm";
+                worksheet.Cells[1, 7].Value = "Số lượng câu hỏi";
+                worksheet.Cells[1, 8].Value = "Bài thi";
+
+                // Dữ liệu lớp học
+                for (int i = 0; i < exams.Count; i++)
+                {
+                    var currentExam = exams[i];
+                    worksheet.Cells[i + 2, 1].Value = i + 1;
+                    worksheet.Cells[i + 2, 2].Value = currentExam.ExamCode;
+                    worksheet.Cells[i + 2, 3].Value = currentExam.ExamName;
+                    worksheet.Cells[i + 2, 4].Value = currentExam.ExamDate.ToString("dd-MM-yyyy HH:mm");
+                    worksheet.Cells[i + 2, 5].Value = currentExam.Duration;
+                    worksheet.Cells[i + 2, 6].Value = currentExam.TotalMarks;
+                    worksheet.Cells[i + 2, 7].Value = currentExam.NumberOfQuestions;
+
+                    // Sử dụng await để gọi hàm bất đồng bộ GetTestNameById
+                    worksheet.Cells[i + 2, 8].Value = currentExam.TestID;
+                }
+
+                // Trả về byte array của file Excel
+                return package.GetAsByteArray();
+            }
+        }
+
     }
 }

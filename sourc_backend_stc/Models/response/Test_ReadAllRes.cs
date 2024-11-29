@@ -9,7 +9,6 @@ namespace sourc_backend_stc.Models
         public DateTime? UpdateDate { get; set; } // Mặc định là thời gian hiện tại
         public DateTime? CreateDate { get; set; } // Mặc định là thời gian hiện tại
         public int? SubjectsID { get; set; } // Có thể null
-        //public string? SubjectsCode { get; set; }
         public string? SubjectsName { get; set; }
     }
 }

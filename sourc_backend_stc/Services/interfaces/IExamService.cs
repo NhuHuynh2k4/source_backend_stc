@@ -11,5 +11,6 @@ namespace sourc_backend_stc.Services
         Task<bool> DeleteExam(int examId);
         Task<Exam_ReadAllRes> GetExamById(int examId);
         Task<IEnumerable<Exam_ReadAllRes>> GetAllExams();
+        byte[] ExportExamsToExcel(List<Exam_ReadAllRes> exams);
     }
 }

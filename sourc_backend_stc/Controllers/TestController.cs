@@ -11,7 +11,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class TestController : ControllerBase
     {
         private readonly ITestService _testService;
@@ -25,8 +25,8 @@ namespace sourc_backend_stc.Controllers
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<Test_ReadAllRes>>> GetAllTestes()
         {
-            var classes = await _testService.GetAllTests();
-            return Ok(classes); // Trả về danh sách lớp học với mã 200 OK
+            var tests = await _testService.GetAllTests();
+            return Ok(tests); // Trả về danh sách lớp học với mã 200 OK
         }
 
         // Tạo mới Test
@@ -116,6 +116,49 @@ namespace sourc_backend_stc.Controllers
             else
             {
                 return NotFound("Không tìm thấy lớp học với ID đã cho.");
+            }
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchTests([FromQuery] string testCode, [FromQuery] string testName, [FromQuery] string numberOfQuestion, [FromQuery] string subjectName)
+        {
+            try
+            {
+                // Gọi dịch vụ tìm kiếm
+                var tests = await _testService.SearchTests(testCode, testName, numberOfQuestion, subjectName);
+
+                // Trả về kết quả tìm kiếm
+                return Ok(tests);
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
+            }
+        }
+
+        // Endpoint để xuất lớp học ra file Excel
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportTestsToExcel()
+        {
+            try
+            {
+                // Lấy danh sách các lớp học từ dịch vụ của bạn
+                var tests = await _testService.GetAllTests();
+
+                // Chuyển đổi từ IEnumerable sang List
+                var testsList = tests.ToList(); // Sử dụng ToList() để chuyển đổi
+
+                // Sử dụng service ExcelExportService để xuất dữ liệu ra file Excel
+                var excelFile = _testService.ExportTestsToExcel(testsList);
+
+                // Trả về file Excel cho client
+                return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Tests.xlsx");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return StatusCode(StatusCodes.Status500InternalServerError, "Có lỗi xảy ra khi xuất Excel.");
             }
         }
 

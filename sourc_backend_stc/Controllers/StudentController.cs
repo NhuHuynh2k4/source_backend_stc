@@ -11,7 +11,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-
+    // [AllowAnonymous]
     public class StudentController : ControllerBase
     {
         private readonly IStudentService _studentService;
@@ -23,7 +23,7 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy tất cả các sinh viên
         [HttpGet("get-all")]
-        //[Authorize]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Student_ReadAllRes>>> GetAllStudent()
         {
             var classes = await _studentService.GetAllStudent();
@@ -37,7 +37,7 @@ namespace sourc_backend_stc.Controllers
             if (createReq == null)
             {
                 // Trả về mã 400 Bad Request nếu đầu vào không hợp lệ
-                return BadRequest(new {messgase="Yêu cầu không hợp lệ."});
+                return BadRequest("Yêu cầu không hợp lệ.");
             }
 
             var isCreated = await _studentService.CreateStudent(createReq);
@@ -45,7 +45,7 @@ namespace sourc_backend_stc.Controllers
             if (isCreated)
             {
                 // Trả về mã 201 Created nếu thành công
-                return CreatedAtAction(nameof(CreateStudent), new { id = createReq.StudentCode }, new {messgase="Sinh viên đã được tạo thành công."});
+                return CreatedAtAction(nameof(CreateStudent), new { id = createReq.StudentCode }, "Sinh viên đã được tạo thành công.");
             }
             else
             {
@@ -57,13 +57,13 @@ namespace sourc_backend_stc.Controllers
 
         // // Lấy Student theo ID
         [HttpGet("get-by-id/{studentId}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetStudentById(int studentId)
         {
             if (studentId <= 0)
             {
                 // Trả về mã lỗi 400 nếu studentId không hợp lệ
-                return BadRequest(new {messgase="ID sinh viên không hợp lệ."});
+                return BadRequest("ID sinh viên không hợp lệ.");
             }
 
             var studentInfo = await _studentService.GetStudentById(studentId);
@@ -76,12 +76,12 @@ namespace sourc_backend_stc.Controllers
             else
             {
                 // Trả về mã lỗi 404 nếu không tìm thấy lớp học
-                return NotFound(new {messgase="Không tìm thấy sinh viên với ID đã cho."});
+                return NotFound("Không tìm thấy sinh viên với ID đã cho.");
             }
         }
 
         [HttpPut("update")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> UpdateClassUpdateStudent([FromBody] Student_UpdateReq updateReq)
         {
             if (updateReq == null || string.IsNullOrWhiteSpace(updateReq.StudentCode)
@@ -89,43 +89,42 @@ namespace sourc_backend_stc.Controllers
             || string.IsNullOrWhiteSpace(updateReq.NumberPhone)
             || string.IsNullOrWhiteSpace(updateReq.Email))
             {
-                return BadRequest(new {messgase="Dữ liệu cập nhật không hợp lệ."});
+                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
             var isUpdated = await _studentService.UpdateStudent(updateReq);
 
             if (isUpdated)
             {
-                return Ok(new {messgase="Cập nhật sinh viên thành công."});
+                return Ok("Cập nhật sinh viên thành công.");
             }
             else
             {
-                return NotFound(new {messgase="Không tìm thấy sinh viên hoặc cập nhật thất bại."});
+                return NotFound("Không tìm thấy sinh viên hoặc cập nhật thất bại.");
             }
         }
 
 
         [HttpDelete("delete/{studentId}")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> DeleteStudent(int studentId)
         {
             if (studentId <= 0)
             {
-                return BadRequest(new {messgase="ID sinh viên không hợp lệ."});
+                return BadRequest("ID sinh viên không hợp lệ.");
             }
 
             var isDeleted = await _studentService.DeleteStudent(studentId);
 
             if (isDeleted)
             {
-                return Ok(new {messgase="Đã xóa mềm sinh viên thành công."});
+                return Ok("Đã xóa mềm sinh viên thành công.");
             }
             else
             {
-                return NotFound( new {messgase="Không tìm thấy sinh viên với ID đã cho."});
+                return NotFound("Không tìm thấy sinh viên với ID đã cho.");
             }
         }
-        
     }
 
 }

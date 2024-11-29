@@ -7,7 +7,7 @@ namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class QuestionController : ControllerBase
     {
         private readonly IQuestionService _questionService;
@@ -60,13 +60,13 @@ namespace sourc_backend_stc.Controllers
 
 
         // Cập nhật câu hỏi
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateQuestion([FromBody] Question_UpdateReq request)
+        [HttpPut("update/{questionId}")]
+        public async Task<IActionResult> UpdateQuestion(int questionId, [FromBody] Question_UpdateReq request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.QuestionCode) || string.IsNullOrWhiteSpace(request.QuestionName))
                 return BadRequest("Dữ liệu cập nhật câu hỏi không hợp lệ.");
 
-            var isUpdated = await _questionService.UpdateQuestion(request);
+            var isUpdated = await _questionService.UpdateQuestion(questionId, request);
             if (isUpdated)
                 return Ok("Cập nhật câu hỏi thành công.");
 

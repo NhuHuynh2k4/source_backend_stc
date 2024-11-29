@@ -9,7 +9,7 @@ namespace sourc_backend_stc.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
     public class QuestionTypeController : ControllerBase
     {
         private readonly IQuestionTypeService _questionTypeService;
