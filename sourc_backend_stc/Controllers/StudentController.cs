@@ -40,9 +40,9 @@ namespace sourc_backend_stc.Controllers
                 return BadRequest("Yêu cầu không hợp lệ.");
             }
 
-            var isCreated = await _studentService.CreateStudent(createReq);
+            var created = await _studentService.CreateStudent(createReq);
 
-            if (isCreated)
+            if (created != null)
             {
                 // Trả về mã 201 Created nếu thành công
                 return CreatedAtAction(nameof(CreateStudent), new { id = createReq.StudentCode }, "Sinh viên đã được tạo thành công.");
@@ -92,9 +92,9 @@ namespace sourc_backend_stc.Controllers
                 return BadRequest("Dữ liệu cập nhật không hợp lệ.");
             }
 
-            var isUpdated = await _studentService.UpdateStudent(updateReq);
+            var updated = await _studentService.UpdateStudent(updateReq);
 
-            if (isUpdated)
+            if (updated != null)
             {
                 return Ok("Cập nhật sinh viên thành công.");
             }
