@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
+    "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
   },
   "projects": {
-    "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {
+    "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "projectUniqueName": "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
         "projectName": "sourc_backend_stc",
-        "projectPath": "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "projectPath": "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\obj\\",
+        "outputPath": "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"

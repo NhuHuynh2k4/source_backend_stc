@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "pmOX4lYHlIxB6VlKfcm01XdREjr9Dwh0go/7VMH9MF3BEi2N2PGen0jo1kjs662PIoAMmEKJ5btdnOnKnCeHZw==",
+  "dgSpecHash": "kUGzwtUQcOTIcHQJjo/Kqo3kNL9QzbpI5iZe9ke3yqaScC6M4Qst51rRSwxyR+zQKCEbeJnclDiYHcK3J28DTw==",
   "success": true,
-  "projectFilePath": "F:\\DuAnSTC\\sourc_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
+  "projectFilePath": "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ADMIN\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
