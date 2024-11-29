@@ -19,6 +19,7 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy thông tin ClassStudent theo ID
         [HttpGet("get-by-id/{id}")]
+        
         public async Task<IActionResult> GetClassStudentByID(int id)
         {
             try
@@ -35,26 +36,28 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy tất cả ClassStudents
         [HttpGet("get-all")]
-public async Task<IActionResult> GetAll()
-{
-    try
-    {
-        var result = await _classStudentService.GetAllClassStudent();
-        if (result == null || !result.Any())
+        
+        public async Task<IActionResult> GetAll()
         {
-            return NotFound(new { message = "Không có bản ghi nào." });
+            try
+            {
+                var result = await _classStudentService.GetAllClassStudent();
+                if (result == null || !result.Any())
+                {
+                    return NotFound(new { message = "Không có bản ghi nào." });
+                }
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Lỗi khi lấy danh sách ClassStudent", error = ex.Message });
+            }
         }
-        return Ok(result);
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { message = "Lỗi khi lấy danh sách ClassStudent", error = ex.Message });
-    }
-}
 
 
         // Tạo mới ClassStudent
         [HttpPost("create")]
+        
         public async Task<IActionResult> Create([FromBody] ClassStudent_CreateReq request)
         {
             try
@@ -82,6 +85,7 @@ public async Task<IActionResult> GetAll()
 
         // Cập nhật ClassStudent
         [HttpPut("update")]
+        
         public async Task<IActionResult> Update([FromBody] ClassStudent_UpdateReq updateReq)
         {
             try
@@ -101,7 +105,7 @@ public async Task<IActionResult> GetAll()
                 {
                     return BadRequest(new { message = "ID sinh viên không hợp lệ." });
                 }
-                
+
 
                 var success = await _classStudentService.UpdateClassStudent(updateReq.Class_StudentID, updateReq);
                 if (!success) return BadRequest(new { message = "Cập nhật thất bại." });
@@ -115,6 +119,7 @@ public async Task<IActionResult> GetAll()
 
         // Xóa ClassStudent
         [HttpDelete("delete/{id}")]
+        
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -126,6 +131,32 @@ public async Task<IActionResult> GetAll()
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // Endpoint để xuất lớp học ra file Excel
+        [HttpGet("export")]
+        
+        public async Task<IActionResult> ExportClassStudentsToExcel()
+        {
+            try
+            {
+                // Lấy danh sách các lớp học từ dịch vụ của bạn
+                var classStudents = await _classStudentService.GetAllClassStudent();
+
+                // Chuyển đổi từ IEnumerable sang List
+                var classStudentList = classStudents.ToList(); // Sử dụng ToList() để chuyển đổi
+
+                // Sử dụng service ExcelExportService để xuất dữ liệu ra file Excel
+                var excelFile = _classStudentService.ExportClassStudentsToExcel(classStudentList);
+
+                // Trả về file Excel cho client
+                return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ClassStudents.xlsx");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return StatusCode(StatusCodes.Status500InternalServerError, "Có lỗi xảy ra khi xuất Excel.");
             }
         }
     }

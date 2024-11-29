@@ -23,6 +23,7 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy tất cả QuestionTypes
         [HttpGet("get-all")]
+        
         public async Task<IActionResult> GetAll()
         {
             try
@@ -39,6 +40,7 @@ namespace sourc_backend_stc.Controllers
 
         // Lấy QuestionType theo ID
         [HttpGet("get-by-id/{id}")]
+        
         public async Task<IActionResult> GetById(int id)
         {
             try
@@ -59,6 +61,7 @@ namespace sourc_backend_stc.Controllers
 
         // Tạo mới QuestionType
         [HttpPost("create")]
+        
         public async Task<IActionResult> Create([FromBody] QuestionType_CreateReq req)
         {
             try
@@ -84,6 +87,7 @@ namespace sourc_backend_stc.Controllers
 
         // Cập nhật QuestionType
         [HttpPut("update")]
+        
         public async Task<IActionResult> Update([FromBody] QuestionType_UpdateReq req)
         {
             try
@@ -110,6 +114,7 @@ namespace sourc_backend_stc.Controllers
 
         // Xóa QuestionType
         [HttpDelete("delete/{id}")]
+        
         public async Task<IActionResult> Delete(int id)
         {
             try
@@ -125,6 +130,31 @@ namespace sourc_backend_stc.Controllers
             {
                 _logger.LogError($"Lỗi khi xóa QuestionType với ID {id}: {ex.Message}");
                 return BadRequest(new { message = "Đã có lỗi xảy ra khi xóa loại câu hỏi." });
+            }
+        }
+
+        [HttpGet("export")]
+        
+        public async Task<IActionResult> ExportQuestionTypeToExcel()
+        {
+            try
+            {
+                // Lấy danh sách các lớp học từ dịch vụ của bạn
+                var questionTypes = await _questionTypeService.GetAllQuestionType();
+
+                // Chuyển đổi từ IEnumerable sang List
+                var questionTypeList = questionTypes.ToList(); // Sử dụng ToList() để chuyển đổi
+
+                // Sử dụng service ExcelExportService để xuất dữ liệu ra file Excel
+                var excelFile = _questionTypeService.ExportQuestionTypeToExcel(questionTypeList);
+
+                // Trả về file Excel cho client
+                return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ClassStudents.xlsx");
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                return StatusCode(StatusCodes.Status500InternalServerError, "Có lỗi xảy ra khi xuất Excel.");
             }
         }
     }
