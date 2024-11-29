@@ -3,6 +3,8 @@ using sourc_backend_stc.Models;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using OfficeOpenXml;
+
 using Dapper;
 using System.Data;
 using Newtonsoft.Json;
@@ -36,15 +38,12 @@ namespace sourc_backend_stc.Services
                 }
                 catch (Exception ex)
                 {
-                    // Log lỗi ra console hoặc file log để biết chi tiết lỗi từ database
                     Console.WriteLine($"Lỗi khi truy vấn database: {ex.Message}");
                     throw new Exception("Lỗi khi lấy danh sách ClassStudent từ database.");
                 }
             }
         }
 
-
-        // Lấy thông tin ClassStudent theo ID
         public async Task<ClassStudent_ReadAllRes> GetClassStudentById(int classStudentId)
         {
             using (var connection = DatabaseConnection.GetConnection(_configuration))
@@ -54,8 +53,8 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     var result = await connection.QueryFirstOrDefaultAsync<ClassStudent_ReadAllRes>(
-                        "GetClassStudentById", // Tên stored procedure
-                        new { Class_StudentID = classStudentId }, // Truyền tham số đúng tên
+                        "GetClassStudentById",
+                        new { Class_StudentID = classStudentId },
                         commandType: CommandType.StoredProcedure
                     );
 
@@ -83,6 +82,7 @@ namespace sourc_backend_stc.Services
 
                 try
                 {
+
                     var result = await connection.ExecuteAsync(
                         "CreateClassStudent",
                         classStudentDto,
@@ -107,19 +107,24 @@ namespace sourc_backend_stc.Services
 
                 try
                 {
-                    // Kiểm tra nếu dữ liệu yêu cầu cập nhật không hợp lệ
+                    
                     if (updateReq == null)
                     {
                         throw new ArgumentException("Dữ liệu yêu cầu không hợp lệ.");
                     }
 
-                    // Thực hiện cập nhật thông qua stored procedure
                     var result = await connection.ExecuteAsync(
-                        "UpdateClassStudent",updateReq,
+                        "UpdateClassStudent",
+                        new
+                        {
+                            Class_StudentID = id,
+                            ClassID = updateReq.ClassID,
+                            StudentID = updateReq.StudentID
+                        },
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu cập nhật thành công
+                    return result > 0;
                 }
                 catch (Exception ex)
                 {
@@ -128,7 +133,6 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        // Xóa ClassStudent
         public async Task<bool> DeleteClassStudent(int classStudentId)
         {
             using (var connection = DatabaseConnection.GetConnection(_configuration))
@@ -137,34 +141,60 @@ namespace sourc_backend_stc.Services
 
                 try
                 {
-                    // Kiểm tra xem ClassStudent có tồn tại hay không
                     var existingClassStudent = await connection.QueryFirstOrDefaultAsync<ClassStudent>(
-                        "GetClassStudentById", // Giả sử bạn có một stored procedure hoặc query để lấy ClassStudent theo ID
+                        "GetClassStudentById",
                         new { Class_StudentID = classStudentId },
                         commandType: CommandType.StoredProcedure
                     );
 
-                    // Nếu không tìm thấy ClassStudent, ném ra ngoại lệ
                     if (existingClassStudent == null)
                     {
                         throw new Exception($"Không tìm thấy ClassStudent với ID {classStudentId}. Không thể xóa.");
                     }
 
-                    // Nếu tồn tại ClassStudent, thực hiện xóa
                     var result = await connection.ExecuteAsync(
-                        "DeleteClassStudent",  // Tên của stored procedure xóa ClassStudent
+                        "DeleteClassStudent",
                         new { Class_StudentID = classStudentId },
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu xóa thành công
+                    return result > 0;
                 }
                 catch (Exception ex)
                 {
-                    // Lỗi khác trong quá trình xóa
                     throw new Exception("Lỗi khi xóa ClassStudent", ex);
                 }
             }
         }
+
+        public byte[] ExportClassStudentsToExcel(List<ClassStudent_ReadAllRes> classStudents)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("ClassStudents");
+
+                // Đặt tiêu đề cho các cột
+                worksheet.Cells[1, 1].Value = "STT";
+                worksheet.Cells[1, 2].Value = "Mã lớp";
+                worksheet.Cells[1, 3].Value = "Mã học sinh";
+                worksheet.Cells[1, 4].Value = "Ngày tạo";
+                worksheet.Cells[1, 5].Value = "Ngày cập nhật";
+
+                // Dữ liệu lớp học
+                for (int i = 0; i < classStudents.Count; i++)
+                {
+                    var currentClassStudent = classStudents[i];
+                    worksheet.Cells[i + 2, 1].Value = i + 1;
+                    worksheet.Cells[i + 2, 2].Value = currentClassStudent.ClassID;
+                    worksheet.Cells[i + 2, 3].Value = currentClassStudent.StudentID;
+                    worksheet.Cells[i + 2, 4].Value = currentClassStudent.CreateDate;
+                    worksheet.Cells[i + 2, 5].Value = currentClassStudent.UpdateDate;
+                }
+
+                // Trả về byte array của file Excel
+                return package.GetAsByteArray();
+            }
+        }
     }
+
 }

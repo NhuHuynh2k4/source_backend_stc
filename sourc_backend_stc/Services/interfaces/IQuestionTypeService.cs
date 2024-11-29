@@ -9,5 +9,7 @@ namespace sourc_backend_stc.Services
         Task<bool> CreateQuestionType(QuestionType_CreateReq request);
         Task<bool> UpdateQuestionType(QuestionType_UpdateReq req);
         Task<bool> DeleteQuestionType(int id);
+        // byte[] ExportQuestionTypeToExcel(List<QuestionType_ReadAllRes> questionTypes);
+        byte[] ExportQuestionTypeToExcel(List<QuestionTypeResponse> questionTypeList);
     }
 }

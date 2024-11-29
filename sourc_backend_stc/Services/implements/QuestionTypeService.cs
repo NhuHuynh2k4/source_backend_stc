@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
+using OfficeOpenXml;
 
 namespace sourc_backend_stc.Services
 {
@@ -147,6 +148,35 @@ namespace sourc_backend_stc.Services
                     _logger.LogError($"Lỗi khi xóa QuestionType với ID {id}: {ex.Message}");
                     throw new Exception("Lỗi khi xóa QuestionType", ex);
                 }
+            }
+        }
+
+        public byte[] ExportQuestionTypeToExcel(List<QuestionTypeResponse> questionTypeList)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("QuestionTypeList");
+
+                // Đặt tiêu đề cho các cột
+                worksheet.Cells[1, 1].Value = "STT";
+                worksheet.Cells[1, 2].Value = "Mã loại câu hỏi";
+                worksheet.Cells[1, 3].Value = "Tên loại câu hỏi";
+                worksheet.Cells[1, 4].Value = "Ngày tạo";
+                worksheet.Cells[1, 5].Value = "ngày cập nhật";
+
+                // Dữ liệu lớp học
+                for (int i = 0; i < questionTypeList.Count; i++)
+                {
+                    var currentQuestionType = questionTypeList[i];
+                    worksheet.Cells[i + 2, 1].Value = i + 1;
+                    worksheet.Cells[i + 2, 2].Value = currentQuestionType.QuestionTypeCode;
+                    worksheet.Cells[i + 2, 3].Value = currentQuestionType.QuestionTypeCode;
+                    worksheet.Cells[i + 2, 5].Value = currentQuestionType.CreateDate;
+                    worksheet.Cells[i + 2, 6].Value = currentQuestionType.UpdateDate;
+                }
+
+                // Trả về byte array của file Excel
+                return package.GetAsByteArray();
             }
         }
     }
