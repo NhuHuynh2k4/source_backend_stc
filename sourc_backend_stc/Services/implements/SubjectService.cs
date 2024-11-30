@@ -49,25 +49,43 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateSubjectAsync(int subjectId, Subject_UpdateReq request)
+        public async Task<bool> UpdateSubjectAsync(Subject_UpdateReq updateReq)
         {
-            using var connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            const string query = @"
-        EXEC UpdateSubject 
-            @SubjectsID = @SubjectsID, 
-            @SubjectsCode = @SubjectsCode, 
-            @SubjectsName = @SubjectsName";
+            // Kiểm tra đầu vào
+            var (isValidCode, messageCode) = ErrorHandling.HandleIfEmpty(updateReq.SubjectsCode);
+            var (isValidName, messageName) = ErrorHandling.HandleIfEmpty(updateReq.SubjectsName);
 
-            var parameters = new
+            if (!isValidCode || !isValidName)
             {
-                SubjectsID = subjectId,
-                request.SubjectsCode,
-                request.SubjectsName
-            };
+                return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
+            }
 
-            var result = await connection.ExecuteAsync(query, parameters);
-            return result > 0;
+            using (var connection = DatabaseConnection.GetConnection(_configuration))
+            {
+                await connection.OpenAsync();
+
+                try
+                {
+                    // Gọi stored procedure để cập nhật môn học
+                    var result = await connection.ExecuteAsync(
+                        "UpdateSubject", // Tên của stored procedure
+                        updateReq, // Truyền đối tượng updateReq chứa các tham số cần thiết
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    // Trả về true nếu cập nhật thành công
+                    return result > 0;
+                }
+                catch (Exception ex)
+                {
+                    // Log lỗi nếu cần thiết
+                    Console.WriteLine($"Lỗi khi cập nhật môn học: {ex.Message}");
+                    return false; // Trả về false nếu có lỗi xảy ra
+                }
+            }
         }
+
+
 
 
         public async Task<bool> DeleteSubjectAsync(int subjectId)

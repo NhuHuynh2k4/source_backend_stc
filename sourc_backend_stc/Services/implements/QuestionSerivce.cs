@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-
+using sourc_backend_stc.Utils;
 namespace sourc_backend_stc.Services
 {
     public class QuestionService : IQuestionService
@@ -38,7 +38,7 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<int> CreateQuestion(Question_CreateReq request)
+        public async Task<int> CreateQuestion(Question_CreateReq createReq)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -53,12 +53,12 @@ namespace sourc_backend_stc.Services
 
                 var parameters = new
                 {
-                    request.QuestionCode,
-                    request.QuestionName,
-                    request.QuestionTextContent,
-                    request.QuestionImgContent,
-                    request.SubjectsID,
-                    request.QuestionTypeID
+                    createReq.QuestionCode,
+                    createReq.QuestionName,
+                    createReq.QuestionTextContent,
+                    createReq.QuestionImgContent,
+                    createReq.SubjectsID,
+                    createReq.QuestionTypeID
                 };
 
                 return await connection.ExecuteScalarAsync<int>(query, parameters);
@@ -66,35 +66,58 @@ namespace sourc_backend_stc.Services
         }
 
 
-        public async Task<bool> UpdateQuestion(int questionId, Question_UpdateReq request)
+        public async Task<bool> UpdateQuestion(Question_UpdateReq updateReq)
         {
-            using (var connection = new SqlConnection(_connectionString))
+            // Kiểm tra dữ liệu đầu vào
+            (bool isValidCode, string messageCode) = ErrorHandling.HandleIfEmpty(updateReq.QuestionCode);
+            (bool isValidName, string messageName) = ErrorHandling.HandleIfEmpty(updateReq.QuestionName);
+            (bool isValidContent, string messageContent) = ErrorHandling.HandleIfEmpty(updateReq.QuestionTextContent);
+
+            if (!isValidCode || !isValidName || !isValidContent || updateReq.SubjectsID <= 0 || updateReq.QuestionTypeID <= 0)
             {
-                const string query = @"
-            EXEC UpdateQuestion 
-                @QuestionID = @QuestionID, 
-                @QuestionCode = @QuestionCode, 
-                @QuestionName = @QuestionName, 
-                @QuestionTextContent = @QuestionTextContent, 
-                @QuestionImgContent = @QuestionImgContent, 
-                @SubjectsID = @SubjectsID, 
-                @QuestionTypeID = @QuestionTypeID";
+                Console.WriteLine("Dữ liệu đầu vào không hợp lệ");
+                return false;
+            }
 
-                var parameters = new
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
                 {
-                    QuestionID = questionId,
-                    request.QuestionCode,
-                    request.QuestionName,
-                    request.QuestionTextContent,
-                    request.QuestionImgContent,
-                    request.SubjectsID,
-                    request.QuestionTypeID
-                };
+                    await connection.OpenAsync();
 
-                var rowsAffected = await connection.ExecuteAsync(query, parameters);
-                return rowsAffected > 0;
+                    const string query = @"
+                    EXEC UpdateQuestion 
+                        @QuestionID = @QuestionID, 
+                        @QuestionCode = @QuestionCode, 
+                        @QuestionName = @QuestionName, 
+                        @QuestionTextContent = @QuestionTextContent, 
+                        @QuestionImgContent = @QuestionImgContent, 
+                        @SubjectsID = @SubjectsID, 
+                        @QuestionTypeID = @QuestionTypeID";
+
+                    var parameters = new
+                    {
+                        updateReq.QuestionID,
+                        updateReq.QuestionCode,
+                        updateReq.QuestionName,
+                        updateReq.QuestionTextContent,
+                        updateReq.QuestionImgContent,
+                        updateReq.SubjectsID,
+                        updateReq.QuestionTypeID
+                    };
+
+                    var rowsAffected = await connection.ExecuteAsync(query, parameters, commandType: CommandType.Text);
+                    return rowsAffected > 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Lỗi khi cập nhật câu hỏi: {ex.Message}");
+                return false;
             }
         }
+
+
 
 
         public async Task<bool> DeleteQuestion(int questionId)

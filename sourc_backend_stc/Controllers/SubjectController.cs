@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 namespace sourc_backend_stc.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
+    [AllowAnonymous]
     public class SubjectController : ControllerBase
     {
         private readonly ISubjectService _subjectService;
@@ -23,30 +22,39 @@ namespace sourc_backend_stc.Controllers
         [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<SubjectReadAllRes>>> GetAllSubjects()
         {
-            var subjects = await _subjectService.GetAllSubjectsAsync();
-            return Ok(subjects);
+            try
+            {
+                var subjects = await _subjectService.GetAllSubjectsAsync();
+                return Ok(subjects);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
         }
 
         // Tạo mới môn học
         [HttpPost("create")]
         public async Task<IActionResult> CreateSubject([FromBody] Subject_CreateReq request)
         {
-            if (request == null)
-                return BadRequest("Yêu cầu không hợp lệ.");
+            // Kiểm tra dữ liệu đầu vào
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.SubjectsCode) || request.SubjectsCode == "string" ||
+                string.IsNullOrWhiteSpace(request.SubjectsName) || request.SubjectsName == "string")
+            {
+                return BadRequest("Dữ liệu yêu cầu không hợp lệ.");
+            }
 
             try
             {
-                // Gọi phương thức tạo môn học
                 await _subjectService.CreateSubjectAsync(request);
                 return Ok(new { message = "Môn học đã tạo thành công." });
             }
             catch (Exception ex)
             {
-                // Trả về thông báo lỗi nếu có ngoại lệ xảy ra
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(500, new { message = $"Lỗi khi tạo môn học: {ex.Message}" });
             }
         }
-
 
         // Lấy môn học theo ID
         [HttpGet("get-by-id/{subjectId}")]
@@ -55,21 +63,51 @@ namespace sourc_backend_stc.Controllers
             if (subjectId <= 0)
                 return BadRequest("ID môn học không hợp lệ.");
 
-            var subject = await _subjectService.GetSubjectByIdAsync(subjectId);
-            return subject != null ? Ok(subject) : NotFound("Không tìm thấy môn học với ID đã cho.");
+            try
+            {
+                var subject = await _subjectService.GetSubjectByIdAsync(subjectId);
+                if (subject != null)
+                    return Ok(subject);
+
+                return NotFound("Không tìm thấy môn học với ID đã cho.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Lỗi server: {ex.Message}");
+            }
         }
 
         // Cập nhật môn học
-        [HttpPut("update/{subjectId}")]
-        public async Task<IActionResult> UpdateSubject(int subjectId, [FromBody] Subject_UpdateReq request)
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateSubject([FromBody] Subject_UpdateReq request)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.SubjectsCode) || string.IsNullOrWhiteSpace(request.SubjectsName))
-                return BadRequest("Dữ liệu cập nhật không hợp lệ.");
+            // Kiểm tra dữ liệu đầu vào
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.SubjectsCode) || request.SubjectsCode == "string" ||
+                string.IsNullOrWhiteSpace(request.SubjectsName) || request.SubjectsName == "string")
+            {
+                return BadRequest(new { message = "Dữ liệu cập nhật không hợp lệ." });
+            }
 
-            var isUpdated = await _subjectService.UpdateSubjectAsync(subjectId, request);
-
-            return isUpdated ? Ok("Cập nhật môn học thành công.") : NotFound("Không tìm thấy môn học hoặc cập nhật thất bại.");
+            try
+            {
+                // Cập nhật môn học dựa trên SubjectsCode
+                var isUpdated = await _subjectService.UpdateSubjectAsync(request);
+                if (isUpdated)
+                {
+                    // Trả về đối tượng JSON khi cập nhật thành công
+                    return Ok(new { message = "Cập nhật môn học thành công." });
+                }
+                return NotFound(new { message = "Không tìm thấy môn học hoặc cập nhật thất bại." });
+            }
+            catch (Exception ex)
+            {
+                // Trả về thông báo lỗi dưới dạng JSON khi gặp lỗi
+                return StatusCode(500, new { message = $"Lỗi khi cập nhật môn học: {ex.Message}" });
+            }
         }
+
+
 
         // Xóa mềm môn học
         [HttpDelete("delete/{subjectId}")]
@@ -78,8 +116,18 @@ namespace sourc_backend_stc.Controllers
             if (subjectId <= 0)
                 return BadRequest("ID môn học không hợp lệ.");
 
-            var isDeleted = await _subjectService.DeleteSubjectAsync(subjectId);
-            return isDeleted ? Ok("Đã xóa mềm môn học thành công.") : NotFound("Không tìm thấy môn học với ID đã cho.");
+            try
+            {
+                var isDeleted = await _subjectService.DeleteSubjectAsync(subjectId);
+                if (isDeleted)
+                    return Ok("Đã xóa mềm môn học thành công.");
+
+                return NotFound("Không tìm thấy môn học với ID đã cho.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Lỗi khi xóa môn học: {ex.Message}" });
+            }
         }
     }
 }

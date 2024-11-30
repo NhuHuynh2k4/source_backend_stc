@@ -5,8 +5,8 @@ namespace sourc_backend_stc.Services
     {
         Task<IEnumerable<SubjectReadAllRes>> GetAllSubjectsAsync();
         Task<SubjectReadAllRes> GetSubjectByIdAsync(int subjectId);
-        Task<int> CreateSubjectAsync(Subject_CreateReq request);
-        Task<bool> UpdateSubjectAsync(int subjectId, Subject_UpdateReq request);
+        Task<int> CreateSubjectAsync(Subject_CreateReq createReq);
+        Task<bool> UpdateSubjectAsync(Subject_UpdateReq updateReq);
         Task<bool> DeleteSubjectAsync(int subjectId);
     }
 }
