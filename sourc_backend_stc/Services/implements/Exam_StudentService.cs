@@ -34,29 +34,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure // Xác định là stored procedure
                     );
 
-
-                    return result.Select(Exam_StudentInfo => new Exam_StudentRes
-                    {
-
-                        Exam_StudentID = Exam_StudentInfo.Exam_StudentID,
-                        ExamID = Exam_StudentInfo.ExamID,
-                        ExamCode = Exam_StudentInfo.ExamCode,
-                        ExamName = Exam_StudentInfo.ExamName,
-                        Duration = Exam_StudentInfo.Duration,
-                        NumberOfQuestions = Exam_StudentInfo.NumberOfQuestions,
-                        TotalMarks = Exam_StudentInfo.TotalMarks,
-                        StudentID = Exam_StudentInfo.StudentID,
-                        StudentCode = Exam_StudentInfo.StudentCode,
-                        StudentName = Exam_StudentInfo.StudentName,
-                        Gender = Exam_StudentInfo.Gender,
-                        NumberPhone = Exam_StudentInfo.NumberPhone,
-                        Address = Exam_StudentInfo.Address,
-                        Email = Exam_StudentInfo.Email,
-                        BirthdayDate = Exam_StudentInfo.BirthdayDate,
-                        UpdateDate = Exam_StudentInfo.UpdateDate,
-                        CreateDate = Exam_StudentInfo.CreateDate,
-
-                    });
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -85,7 +63,7 @@ namespace sourc_backend_stc.Services
                     // Sử dụng Dapper để gọi stored procedure
                     var result = await connection.QueryFirstOrDefaultAsync<Exam_StudentRes>(
                         "GetExam_StudentByID",  // Tên stored procedure
-                        new { Exam_StudentID = Exam_StudentId },  // Tham số đầu vào
+                        new {Exam_StudentID = Exam_StudentId },  // Tham số đầu vào
                         commandType: CommandType.StoredProcedure  // Xác định là stored procedure
                     );
 
@@ -103,20 +81,13 @@ namespace sourc_backend_stc.Services
             // Kiểm tra đầu vào
             var (isValidStudentID, messageStudentID) = ErrorHandling.ValidateId(createReq.StudentID);
             var (isValidExamID, messageExamID) = ErrorHandling.ValidateId(createReq.ExamID);
-
+            
 
             // Kiểm tra tất cả các trường đầu vào
-            if (!isValidStudentID || !isValidExamID)
+            if (!isValidStudentID || !isValidExamID )
             {
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
-
-            var newExam_Student = new Exam_Student_CreateReq
-            {
-                ExamID = createReq.ExamID,
-                StudentID = createReq.StudentID
-
-            };
 
             using (var connection = DatabaseConnection.GetConnection(_configuration))
             {
@@ -125,7 +96,7 @@ namespace sourc_backend_stc.Services
                 try
                 {
                     // Sử dụng Dapper để gọi stored procedure
-                    var result = await connection.ExecuteAsync("CreateExam_Student", newExam_Student, commandType: CommandType.StoredProcedure);
+                    var result = await connection.ExecuteAsync("CreateExam_Student", createReq, commandType: CommandType.StoredProcedure);
 
                     if (result > 0)
                     {
@@ -168,7 +139,7 @@ namespace sourc_backend_stc.Services
                         commandType: CommandType.StoredProcedure
                     );
 
-                    return result > 0; // Trả về true nếu cập nhật thành công
+                    return result==1; // Trả về true nếu cập nhật thành công
                 }
                 catch (Exception ex)
                 {
@@ -178,14 +149,14 @@ namespace sourc_backend_stc.Services
             }
         }
 
-        public async Task<bool> UpdateExam_Student(int Exam_StudentId, Exam_Student_UpdateReq updateReq)
+        public async Task<bool> UpdateExam_Student(Exam_Student_UpdateReq updateReq)
         {
             var (isValidStudentID, messageStudentID) = ErrorHandling.ValidateId(updateReq.StudentID);
             var (isValidExamID, messageExamID) = ErrorHandling.ValidateId(updateReq.ExamID);
-
+            
 
             // Kiểm tra tất cả các trường đầu vào
-            if (!isValidStudentID || !isValidExamID)
+            if (!isValidStudentID || !isValidExamID )
             {
                 return ErrorHandling.HandleError(StatusCodes.Status400BadRequest); // Trả về lỗi nếu dữ liệu không hợp lệ
             }
@@ -197,13 +168,7 @@ namespace sourc_backend_stc.Services
                 {
                     // Gọi stored procedure để cập nhật lớp học
                     var result = await connection.ExecuteAsync(
-                        "UpdateExam_Student",
-                        new
-                        {
-                            Exam_StudentID = Exam_StudentId,             // ID lấy từ tham số hàm
-                            ExamID = updateReq.ExamID,                  // Lấy dữ liệu từ updateReq
-                            StudentID = updateReq.StudentID
-                        },
+                        "UpdateExam_Student", updateReq,
                         commandType: CommandType.StoredProcedure
                     );
 

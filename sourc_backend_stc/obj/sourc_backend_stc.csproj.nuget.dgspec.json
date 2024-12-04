@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
+    "F:\\DuAnSTC\\source_backend_stc\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {}
   },
   "projects": {
-    "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {
+    "F:\\DuAnSTC\\source_backend_stc\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "projectUniqueName": "F:\\DuAnSTC\\source_backend_stc\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
         "projectName": "sourc_backend_stc",
-        "projectPath": "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
+        "projectPath": "F:\\DuAnSTC\\source_backend_stc\\source_backend_stc\\sourc_backend_stc\\sourc_backend_stc.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "F:\\DuAnSTC\\source_backend_stc\\sourc_backend_stc\\obj\\",
+        "outputPath": "F:\\DuAnSTC\\source_backend_stc\\source_backend_stc\\sourc_backend_stc\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -54,6 +54,10 @@
               "target": "Package",
               "version": "[7.0.20, )"
             },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[5.2.2, )"
+            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[7.0.20, )"
@@ -68,9 +72,13 @@
               "target": "Package",
               "version": "[7.0.20, )"
             },
-            "Newtonsoft.Json": {
+            "Microsoft.Owin": {
               "target": "Package",
-              "version": "[13.0.3, )"
+              "version": "[4.2.2, )"
+            },
+            "Microsoft.Owin.Security.OAuth": {
+              "target": "Package",
+              "version": "[4.2.2, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Dapper;
 using System.Data;
 using sourc_backend_stc.Utils;
+using OfficeOpenXml;
 
 namespace sourc_backend_stc.Services
 {
@@ -245,7 +246,41 @@ public enum UpdateStudentResult
         }
     }
 }
+public byte[] ExportStudentToExcel(List<Student_ReadAllRes> student)
+        {
+            using (var package = new ExcelPackage())
+            {
+                var worksheet = package.Workbook.Worksheets.Add("Student");
 
+                // Đặt tiêu đề cho các cột
+                worksheet.Cells[1, 1].Value = "STT";
+                worksheet.Cells[1, 2].Value = "Mã sinh viên";
+                worksheet.Cells[1, 3].Value = "Họ và tên";
+                worksheet.Cells[1, 4].Value = "Giới tính";
+                worksheet.Cells[1, 5].Value = "Số điện thoại";
+                worksheet.Cells[1, 6].Value = "Địa chỉ";
+                worksheet.Cells[1, 7].Value = "Email";
+                worksheet.Cells[1, 8].Value = "Ngày sinh";
+               
+
+                // Dữ liệu lớp học
+                for (int i = 0; i < student.Count; i++)
+                {
+                    var currentStudent = student[i];
+                    worksheet.Cells[i + 2, 1].Value = i + 1;
+                    worksheet.Cells[i + 2, 2].Value = currentStudent.StudentCode;
+                    worksheet.Cells[i + 2, 3].Value = currentStudent.StudentName;
+                    worksheet.Cells[i + 2, 4].Value = currentStudent.Gender;
+                    worksheet.Cells[i + 2, 5].Value = currentStudent.NumberPhone;
+                    worksheet.Cells[i + 2, 6].Value = currentStudent.Address;
+                    worksheet.Cells[i + 2, 7].Value = currentStudent.Email;
+                    worksheet.Cells[i + 2, 8].Value = currentStudent.BirthdayDate;
+                }
+
+                // Trả về byte array của file Excel
+                return package.GetAsByteArray();
+            }
+        }
 
 
 }
