@@ -174,7 +174,7 @@ namespace sourc_backend_stc.Services
                     worksheet.Cells[i + 2, 1].Value = i + 1;
                     worksheet.Cells[i + 2, 2].Value = currentExam.ExamCode;
                     worksheet.Cells[i + 2, 3].Value = currentExam.ExamName;
-                    worksheet.Cells[i + 2, 4].Value = currentExam.ExamDate.ToString("dd-MM-yyyy HH:mm");
+                    worksheet.Cells[i + 2, 4].Value = currentExam.ExamDate.ToString("dd-MM-yyyy");
                     worksheet.Cells[i + 2, 5].Value = currentExam.Duration;
                     worksheet.Cells[i + 2, 6].Value = currentExam.TotalMarks;
                     worksheet.Cells[i + 2, 7].Value = currentExam.NumberOfQuestions;
